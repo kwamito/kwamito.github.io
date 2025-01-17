@@ -1,9 +1,9 @@
 <div align="center">
-<a href="https://victoreke.com"><img src="./public/logo.png" width="60px"></a>
+<a href="https://kwamito.github.io"></a>
 </div>
 
 <div align="center">
-<h1>victoreke.com</h1>
+<h1>kwamito.github.io</h1>
 <p>My personal portfolio website</p>
 </div>
 
@@ -30,9 +30,9 @@ Follow this guide to get this site runnning locally:
 ### Clone Repository
 
 ```js
-git clone https://github.com/Evavic44/victoreke.com.git
+git clone https://github.com/Evavic44/kwamito.github.io.git
 
-cd victoreke.com
+cd kwamito.github.io
 
 npm install
 ```
