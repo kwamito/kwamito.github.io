@@ -1,0 +1,68 @@
+---
+title: "National Payment Processing Platform"
+description: "A government-grade payment and transaction processing backend handling tens of thousands of daily transactions, automated reconciliation, and real-time reporting."
+problem: "A national government service needed a reliable, auditable, and scalable payment infrastructure to collect fees, route payments across multiple gateways, and reconcile transactions at the end of every business day — with zero tolerance for lost records."
+impact: "Built and running in production. Processes 10,000+ transactions per day across multiple payment gateways, with automated reconciliation, audit logging, and real-time dashboards for administrators."
+tags: ["Python", "Django", "DRF", "PostgreSQL", "GCP", "Cloud Run", "Cloud SQL", "Celery", "REST API"]
+order: 1
+featured: true
+---
+
+## Overview
+
+This project is a government-grade payment processing backend — a system designed to collect service fees, route transactions through payment gateways, track payment status, reconcile end-of-day records, and give administrators visibility into every financial movement across the platform.
+
+The system serves real citizens and real government services. It cannot have downtime at peak hours. It cannot lose records. It cannot be unclear about the state of any payment.
+
+## The Challenge
+
+Building a payment system is not just a technical problem — it's a reliability problem, an auditability problem, and an operational problem all at once.
+
+The core challenges were:
+
+- **Multiple payment gateways:** Supporting mobile money, card payments, and bank transfers through different provider APIs, each with their own response formats, failure modes, and webhook signatures
+- **Exactly-once semantics:** A payment must either succeed or fail, never both. Duplicate charges, lost confirmations, and partial states are unacceptable
+- **Reconciliation:** At the end of each business day, the system must produce a reconciliation report that accounts for every transaction — matched against provider records
+- **Audit trail:** Every state change on every transaction must be logged with a timestamp, actor, and reason — readable by auditors who are not engineers
+- **Performance at volume:** As transaction volume grew, reports that worked at 1,000 records couldn't work at 100,000
+
+## Architecture
+
+The system is built on Django and PostgreSQL, deployed on Google Cloud Run with Cloud SQL as the managed database layer.
+
+**Transaction state machine:**
+Each transaction moves through a defined set of states: `initiated → pending → processing → confirmed / failed / refunded`. State transitions are logged as immutable events, not record overwrites — this gives a complete audit trail with timestamps and context for every change.
+
+**Gateway abstraction layer:**
+I built a provider-agnostic payment gateway interface with Django's class-based approach. Each gateway implements a common contract: `initiate()`, `verify()`, `handle_webhook()`. Adding a new gateway is additive and doesn't touch existing code.
+
+**Webhook handling:**
+Payment confirmation often comes asynchronously via webhooks. The webhook endpoint validates the provider signature, enqueues the update as a Celery task, and returns a 200 immediately. The task idempotently updates the transaction state and triggers downstream effects (receipts, reports, audit records).
+
+**Reconciliation pipeline:**
+A nightly Celery task compares the system's transaction records against provider-reported records. Discrepancies are flagged for manual review. The output is a structured report consumed by both administrators and the finance team.
+
+## Technical Highlights
+
+**PostgreSQL as the foundation of truth:**
+All transaction data lives in a single PostgreSQL database. I relied on database-level constraints and transactions (`select_for_update`, serializable isolation) to prevent race conditions and duplicate state writes — not optimistic locks at the application layer.
+
+**Materialized views for reporting:**
+Daily and monthly summary reports are served from PostgreSQL materialized views, refreshed on a schedule. This separates the reporting query load from the transactional workload and keeps the admin dashboard fast regardless of how many base records exist.
+
+**Idempotency keys:**
+Every transaction is assigned an idempotency key on creation. Payment initiation requests are idempotent — retrying the same request returns the same response without creating a second charge.
+
+**GCP Secret Manager:**
+All API keys, gateway credentials, and database connection strings are stored in GCP Secret Manager and injected at runtime. No secrets in source code, no secrets in environment variable files committed to the repository.
+
+**Cloud Run for deployment:**
+The application is deployed as a Docker container on Cloud Run with a separate worker container for Celery. Cloud SQL Auth Proxy handles database connectivity without exposed IPs. GitHub Actions handles build → test → deploy on every merge to `main`.
+
+## What I Learned
+
+Payment systems teach you exactly how many assumptions exist in "happy path" thinking. Gateways time out. Webhooks arrive twice, or not at all. Networks drop in the middle of a state transition.
+
+The most important discipline I developed on this project was treating every external interaction as inherently unreliable, and designing the system to converge to a correct state regardless of the order or timing of events.
+
+{/* TODO: Add any additional technical details you're comfortable sharing */}

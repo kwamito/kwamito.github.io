@@ -1,0 +1,95 @@
+---
+import Layout from '../../components/layout/Layout.astro';
+import Badge from '../../components/ui/Badge.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, description, problem, impact, tags } = project.data;
+---
+
+<Layout title={title} description={description}>
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+
+    <!-- Back link -->
+    <a
+      href="/projects"
+      class="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors mb-8 group"
+    >
+      <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      All projects
+    </a>
+
+    <!-- Header -->
+    <header class="mb-10">
+      <p class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-3">
+        case study
+      </p>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4">
+        {title}
+      </h1>
+      <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+        {description}
+      </p>
+
+      <!-- Tags -->
+      <div class="flex flex-wrap gap-1.5">
+        {tags.map((tag) => (
+          <Badge label={tag} variant="default" />
+        ))}
+      </div>
+    </header>
+
+    <!-- Problem / Impact summary card -->
+    <div class="grid sm:grid-cols-2 gap-4 mb-10 p-5 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-xl">
+      <div>
+        <p class="font-mono text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1.5">The problem</p>
+        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{problem}</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1.5">The impact</p>
+        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{impact}</p>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="border-slate-200 dark:border-gray-800 mb-10" />
+
+    <!-- MDX content -->
+    <div class="prose-content">
+      <Content />
+    </div>
+
+    <!-- Footer nav -->
+    <div class="mt-16 pt-8 border-t border-slate-200 dark:border-gray-800 flex justify-between items-center">
+      <a
+        href="/projects"
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors group"
+      >
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        All projects
+      </a>
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+      >
+        Get in touch
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </article>
+</Layout>

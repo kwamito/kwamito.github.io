@@ -1,0 +1,60 @@
+---
+title: "Driver & Vehicle Licensing Services Backend"
+description: "Backend API system for a government driver and vehicle licensing platform — managing applicant records, document processing, scheduling, and status tracking for citizens across the country."
+problem: "Government licensing services relied on manual, paper-based processes that created long queues, lost records, and no visibility into application status. A digital backend was needed to support online applications, document management, and officer workflows."
+impact: "Replaced paper-based workflows with a fully digital backend. Citizens can now submit applications, upload documents, and check status online. Officers have a case management interface. Processing time reduced significantly."
+tags: ["Python", "Django", "DRF", "PostgreSQL", "GCP", "Cloud Storage", "REST API", "Cloud Run"]
+order: 2
+featured: true
+---
+
+## Overview
+
+This project is the backend for a national government driver and vehicle licensing platform. It manages applicant records, uploaded documents, scheduling for driving tests and medicals, officer review workflows, and the lifecycle of every application from submission to licence issuance.
+
+The users are both citizens submitting applications and government officers reviewing and approving them. The data involves personal information, legal documents, and official government records — which sets a high bar for accuracy, security, and auditability.
+
+## The Challenge
+
+Government services have particular constraints that commercial products often don't face:
+
+- **Data integrity is non-negotiable:** A licence record must be exactly correct. An incorrect DOB, a missed status change, or a lost document has real legal consequences for the citizen
+- **Multiple actor types:** Citizens, licensing officers, supervisors, and administrators all interact with the same underlying data but with different permissions and different views of it
+- **Document handling at scale:** Applications require scanned documents, photos, and medical certificates — binary files that need secure storage and controlled access
+- **Audit everything:** Every change to an application record must be traceable to a specific user, action, and timestamp
+
+## Architecture
+
+**Application lifecycle as a state machine:**
+Like the payment platform, I modelled the application lifecycle as an explicit state machine. Each transition is validated, logged, and only permitted to specific actor types. This prevents invalid state jumps (e.g., approving an application that hasn't been reviewed) and creates a complete history of every application.
+
+**Role-based access control:**
+Permissions are organized around roles — citizen, officer, supervisor, administrator — with each role having a defined set of allowed actions. Django's permission system forms the base, extended with custom permission classes in DRF that enforce business rules beyond simple field access.
+
+**Document handling:**
+Documents are uploaded via the API, validated for type and size, and stored in Google Cloud Storage. The database stores only metadata (file name, storage path, content type, upload timestamp, uploader). Citizen-facing download links are signed URLs with short expiry — no public file access.
+
+**Officer dashboard API:**
+The backend exposes paginated, filterable, and sortable endpoints for the officer workflow interface. Officers can filter applications by status, date range, applicant details, and office location. PostgreSQL indexes are placed on the columns most commonly used in filter/sort operations.
+
+## Technical Highlights
+
+**Efficient pagination at scale:**
+Standard offset-based pagination degrades at high page numbers. For the officer queue (which can have tens of thousands of pending applications), I implemented keyset-based pagination using the application's created timestamp and primary key as the cursor. Constant-time page retrieval regardless of dataset size.
+
+**Structured audit logging:**
+Rather than storing audit events in the main application tables, I wrote a lightweight audit logging middleware that captures the authenticated user, the model changed, the field-level diff, and the timestamp — stored in a separate audit log table that nothing in the application ever modifies after write.
+
+**Bulk operations:**
+Officers frequently need to update the status of many applications at once (e.g., clearing a batch of applications from a processing queue). The API supports bulk status transitions with a single database round-trip using `update()` on a queryset — not a Python loop calling `save()`.
+
+**Secret and credential management:**
+All environment-specific configuration (database credentials, storage bucket names, API secrets) flows through GCP Secret Manager. The application has no configuration files committed to source control.
+
+## What I Learned
+
+Working on government systems reinforces something that commercial product work can sometimes soften: correctness is not optional. When the data represents legal records, "close enough" isn't a valid outcome.
+
+This project strengthened my understanding of role-based access control design, the value of explicit state machines for complex record lifecycles, and how to build APIs that are easy for other developers to build interfaces on top of.
+
+{/* TODO: Add any additional context you're comfortable sharing */}

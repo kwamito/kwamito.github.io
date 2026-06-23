@@ -1,0 +1,101 @@
+---
+title: "Scaling Django on Cloud Run: What I Learned"
+description: "Practical notes on deploying and scaling a Django application on Google Cloud Run — from container configuration to database connections, concurrency, and cold starts."
+date: 2024-03-15
+tags: ["Django", "GCP", "Cloud Run", "Performance", "DevOps"]
+draft: false
+---
+
+Cloud Run is a good fit for Django applications once you understand how it differs from a traditional server environment. After running Django services on Cloud Run in production, here are the lessons that weren't obvious from the documentation.
+
+## Cloud Run is not a server — it's a request executor
+
+The mental model shift that matters most: Cloud Run doesn't keep your application running between requests. It runs your container in response to requests, and it may scale your container count to zero if traffic stops.
+
+This has concrete implications:
+
+- **No in-memory state between requests.** Django's `settings.CACHES` with `LocMemCache` is useless on Cloud Run — each container instance has its own memory and may be gone after serving a single request. Use Redis or Memcache for anything you want to share.
+- **No background threads.** If you start a background thread in your application startup code to do periodic work, it will not reliably run. Use Cloud Scheduler + Cloud Tasks or Celery workers for background jobs.
+- **Stateless containers are not optional.** Cloud Run makes statelessness a hard requirement, which is actually a good forcing function.
+
+## Database connections: the connection pool problem
+
+Django's default database connection handling opens a new connection per request and closes it at the end. At low concurrency this is fine. Under load, you'll exhaust Cloud SQL's connection limit.
+
+The fix is `django-db-connection-pool` or `pgBouncer` as a connection pooler. I use Cloud SQL's built-in connection pooler (available on Cloud SQL) and set a reasonable `CONN_MAX_AGE` in Django's database settings.
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'CONN_MAX_AGE': 60,  # seconds — reuse connections
+        # ... other settings
+    }
+}
+```
+
+Watch your Cloud SQL metrics for `connections/count` and set an alert before you hit the limit.
+
+## Container startup time matters
+
+Cloud Run's cold starts add latency when a new container instance starts. Django's startup includes importing all installed apps, connecting to the database, and running any `AppConfig.ready()` code.
+
+Keep your startup code lean:
+- Don't do database queries in `AppConfig.ready()`
+- Don't load large files into memory at startup
+- Keep your installed apps list minimal
+
+You can set a minimum number of instances in Cloud Run to keep at least one container warm at all times — worth it for latency-sensitive production services.
+
+## Concurrency settings
+
+Cloud Run allows you to configure how many requests each container instance handles concurrently. Django with gunicorn is synchronous by default — each worker handles one request at a time.
+
+For a Django service, set Cloud Run's concurrency to match your gunicorn worker count. If you run 4 gunicorn workers, set Cloud Run concurrency to 4. More concurrent requests than workers will queue, which is fine up to a point but breaks your latency guarantees under load.
+
+```dockerfile
+CMD ["gunicorn", "--workers=4", "--bind=0.0.0.0:8080", "myproject.wsgi"]
+```
+
+{/* TODO: Expand with specific numbers from your production experience */}
+
+## Secret management
+
+Store nothing sensitive in environment variables for Cloud Run — environment variables are visible in the Cloud Run console to anyone with access. Use Secret Manager instead:
+
+```yaml
+# Cloud Run service configuration
+env:
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: database-url
+        version: latest
+```
+
+This keeps secrets in Secret Manager with proper IAM controls and audit logging, while still being accessible as environment variables inside the container.
+
+## Health checks
+
+Cloud Run uses HTTP health checks to determine if a container is ready to serve traffic. Set up a proper health check endpoint:
+
+```python
+# views.py
+from django.http import JsonResponse
+from django.db import connection
+
+def healthz(request):
+    try:
+        connection.ensure_connection()
+        return JsonResponse({"status": "ok"})
+    except Exception:
+        return JsonResponse({"status": "error"}, status=503)
+```
+
+Configure the startup probe with a longer timeout than the liveness probe — Django takes time to start, and you don't want Cloud Run killing containers that are still initializing.
+
+---
+
+Cloud Run has become my default deployment target for Django services. The managed scaling, the integration with GCP's ecosystem, and the container-native model are a good match for how I think about backend services.
+
+{/* TODO: Add more specific numbers and examples from your experience */}

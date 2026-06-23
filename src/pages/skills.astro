@@ -1,0 +1,99 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import SkillCard from '../components/SkillCard.astro';
+import CTASection from '../components/home/CTASection.astro';
+
+const skillGroups = [
+  {
+    icon: 'backend' as const,
+    title: 'Core Backend',
+    description: 'The tools I think in — daily drivers for APIs, business logic, and data processing.',
+    skills: ['Python 3', 'Django', 'Django REST Framework', 'Celery', 'REST API design', 'Async tasks', 'Webhooks', 'Background jobs'],
+  },
+  {
+    icon: 'database' as const,
+    title: 'Databases & Storage',
+    description: 'Where the truth lives. Query correctness and performance are non-negotiable.',
+    skills: ['PostgreSQL', 'Query optimization', 'Indexing strategies', 'Materialized views', 'Transactions', 'Data modeling', 'Migrations', 'Google Cloud Storage'],
+  },
+  {
+    icon: 'cloud' as const,
+    title: 'Cloud & Infrastructure',
+    description: 'GCP-native deployments, managed services, and container orchestration.',
+    skills: ['Google Cloud Platform', 'Cloud Run', 'Cloud SQL', 'Cloud Storage', 'Secret Manager', 'Pub/Sub', 'Docker', 'Container Registry'],
+  },
+  {
+    icon: 'cicd' as const,
+    title: 'CI/CD & Automation',
+    description: 'Reliable, repeatable deployments that I don\'t have to think about.',
+    skills: ['GitHub Actions', 'Docker builds', 'Automated testing pipelines', 'Zero-downtime deploys', 'Environment promotion', 'Secrets in CI'],
+  },
+  {
+    icon: 'observability' as const,
+    title: 'Observability & Reliability',
+    description: 'You can only trust a system you can see. Monitoring is part of the design, not an afterthought.',
+    skills: ['Sentry / GlitchTip', 'Structured logging', 'Error tracking', 'Performance profiling', 'Slow query analysis', 'Health checks', 'Alerts'],
+  },
+  {
+    icon: 'security' as const,
+    title: 'Security',
+    description: 'Secure by default — authentication, secrets management, and API hardening.',
+    skills: ['Token-based auth', 'OAuth 2.0', 'Signed URLs', 'GCP Secret Manager', 'API rate limiting', 'HTTPS enforcement', 'Secrets rotation', 'CORS policy'],
+  },
+];
+
+const alsoKnow = [
+  'Git', 'Linux', 'Nginx', 'Redis', 'Postman', 'pgAdmin', 'VS Code',
+  'Markdown', 'JSON:API', 'OpenAPI / Swagger', 'Django Admin', 'Django Signals',
+  'Django ORM', 'pytest', 'factory_boy', 'Python dataclasses',
+];
+---
+
+<Layout
+  title="Skills"
+  description="Technical skills of Nana Kwame Oparrey Kuhney — Python, Django, PostgreSQL, GCP, Cloud Run, CI/CD, observability, and backend security."
+>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+    <SectionHeading
+      label="skills"
+      title="What I know and how I use it."
+      subtitle="Organized by what I actually do with each category — not just a list of words on a page."
+    />
+
+    <!-- Main skills grid -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
+      {skillGroups.map((group) => (
+        <SkillCard
+          title={group.title}
+          description={group.description}
+          skills={group.skills}
+          icon={group.icon}
+        />
+      ))}
+    </div>
+
+    <!-- Also comfortable with -->
+    <div class="p-6 md:p-8 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl">
+      <h2 class="font-mono text-xs font-medium tracking-widest text-slate-500 dark:text-slate-500 uppercase mb-5">
+        also comfortable with
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        {alsoKnow.map((skill) => (
+          <span class="px-3 py-1 rounded-lg text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-gray-800 border border-slate-100 dark:border-gray-700">
+            {skill}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <!-- Philosophy note -->
+    <div class="mt-10 p-6 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-2xl">
+      <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+        <strong class="text-slate-900 dark:text-slate-100 font-semibold">A note on this list:</strong> I don't believe in listing every framework or library I've ever imported. These are tools I understand well enough to build with in production, debug when they break, and reason about under load. If something isn't here, I can likely learn it — but I won't pretend expertise I don't have.
+      </p>
+    </div>
+  </div>
+
+  <CTASection />
+</Layout>

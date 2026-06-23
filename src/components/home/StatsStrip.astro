@@ -1,0 +1,42 @@
+---
+const stats = [
+  {
+    value: '10,000+',
+    label: 'transactions / day',
+    detail: 'Government payment platform',
+  },
+  {
+    value: '3+',
+    label: 'years in production',
+    detail: 'Real systems, real stakes',
+  },
+  {
+    value: '5+',
+    label: 'production backends',
+    detail: 'Built, deployed, maintained',
+  },
+  {
+    value: 'GCP',
+    label: 'cloud infrastructure',
+    detail: 'Cloud Run · Cloud SQL · Secret Manager',
+  },
+];
+---
+
+<section class="border-y border-slate-200 dark:border-gray-800 bg-white/60 dark:bg-gray-900/40">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <dl class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+      {stats.map((stat) => (
+        <div class="flex flex-col">
+          <dt class="font-mono text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
+            {stat.value}
+          </dt>
+          <dd class="mt-1">
+            <p class="text-sm font-medium text-slate-700 dark:text-slate-300">{stat.label}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-500 mt-0.5">{stat.detail}</p>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>

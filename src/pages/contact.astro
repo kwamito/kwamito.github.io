@@ -1,0 +1,123 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+
+// TODO: Replace all placeholder links with your actual details
+const contacts = [
+  {
+    label: 'Email',
+    value: 'hello@nanakwame.dev', // TODO: update email
+    href: 'mailto:hello@nanakwame.dev',
+    description: 'Best for detailed questions, project enquiries, or just saying hello.',
+    icon: `<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>`,
+  },
+  {
+    label: 'LinkedIn',
+    value: 'linkedin.com/in/nanakwame', // TODO: update LinkedIn slug
+    href: 'https://linkedin.com/in/', // TODO: add your actual LinkedIn URL
+    description: 'Professional background, recommendations, and work history.',
+    icon: `<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>`,
+  },
+  {
+    label: 'GitHub',
+    value: 'github.com/nanakwame', // TODO: update GitHub username
+    href: 'https://github.com/', // TODO: add your actual GitHub URL
+    description: 'Code, side projects, and open source contributions.',
+    icon: `<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>`,
+  },
+  {
+    label: 'CV / Resume',
+    value: 'Download PDF',
+    href: '/cv.pdf', // TODO: Add cv.pdf to /public/cv.pdf
+    description: 'Full work history and detailed technical background.',
+    icon: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>`,
+    download: true,
+  },
+];
+---
+
+<Layout
+  title="Contact"
+  description="Get in touch with Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. Open to opportunities, contracts, and interesting problems."
+>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+    <SectionHeading
+      label="contact"
+      title="Let's talk."
+      subtitle="I'm open to new opportunities, contracts, and conversations about interesting problems. Reach out through any of these channels."
+    />
+
+    <!-- Contact cards -->
+    <div class="grid sm:grid-cols-2 gap-4 mb-14">
+      {contacts.map((contact) => (
+        <a
+          href={contact.href}
+          target={contact.download ? undefined : '_blank'}
+          rel={contact.download ? undefined : 'noopener noreferrer'}
+          download={contact.download}
+          class="group flex gap-4 p-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-200"
+        >
+          <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <Fragment set:html={contact.icon} />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="font-mono text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-0.5">
+              {contact.label}
+            </p>
+            <p class="font-medium text-slate-900 dark:text-slate-100 text-sm mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+              {contact.value}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed">
+              {contact.description}
+            </p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Availability note -->
+    <div class="p-6 bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl">
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 mt-0.5">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          </span>
+        </div>
+        <div>
+          <p class="font-medium text-slate-900 dark:text-slate-100 text-sm mb-1">
+            Currently open to opportunities {/* TODO: update this status as needed */}
+          </p>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            I'm interested in backend engineering roles, technical contracts, and consulting on production system architecture. Based in Ghana — open to remote work globally.
+            {/* TODO: update availability status and preferences */}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- What I'm looking for -->
+    <div class="mt-8">
+      <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4">
+        What I'm looking for
+      </h2>
+      <ul class="space-y-2" role="list">
+        {[
+          'Interesting backend problems at real scale',
+          'Teams that care about reliability and correctness',
+          'Environments where I can grow and take ownership',
+          'Remote-friendly or based in Accra, Ghana',
+        ].map((item) => (
+          <li class="flex gap-2.5 text-sm text-slate-700 dark:text-slate-300">
+            <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Layout>

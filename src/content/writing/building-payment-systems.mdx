@@ -1,0 +1,76 @@
+---
+title: "Lessons from Building Payment Systems"
+description: "What building a production payment processing system taught me about reliability, failure modes, and the discipline required when money is involved."
+date: 2024-01-20
+tags: ["Payments", "Backend", "Architecture", "Django", "Production"]
+draft: false
+---
+
+Payment systems are unforgiving teachers. The failure modes are real, the consequences are visible, and the margin for "good enough" is much smaller than in most software.
+
+Here are the lessons that changed how I think about backend systems generally — not just payments.
+
+## Money is eventually consistent, but the user experience can't be
+
+Payment processing is inherently asynchronous. You initiate a charge, the gateway processes it (possibly minutes later), and the confirmation arrives via webhook. The state of a payment is often "pending" — not confirmed, not failed.
+
+The mistake I see often is treating payment status as immediately final. A user clicks "Pay," the API call returns 200, and the system marks the order as complete. But the 200 from the gateway initiation endpoint means "we received your request" — not "the payment went through."
+
+The correct model: create a transaction record in `pending` state on initiation. Move it to `confirmed` or `failed` when the webhook arrives. If a webhook never arrives, run a reconciliation job that checks transaction status from the provider.
+
+## Design for webhooks that arrive twice (or never)
+
+Webhook delivery is not guaranteed once. Network issues, provider restarts, and retry policies mean your webhook endpoint will receive the same event multiple times.
+
+Every webhook handler should be idempotent:
+1. Check if you've already processed this event ID
+2. If yes, return 200 immediately without reprocessing
+3. If no, process and store the event ID atomically
+
+```python
+# Idempotent webhook processing
+with transaction.atomic():
+    if WebhookEvent.objects.filter(provider_event_id=event_id).exists():
+        return HttpResponse(status=200)
+    WebhookEvent.objects.create(provider_event_id=event_id, ...)
+    # process the event
+```
+
+Store the event ID before processing. Return 200 to the provider immediately — don't make them wait for your business logic.
+
+## The audit log is not optional
+
+Every state change on every payment record must be auditable. Not "most changes" — every change. Who changed it, when, what it was before, what it is after.
+
+This is not for debugging (though it helps with that). It's for the conversations you will have with finance teams, operations staff, and sometimes regulators when someone asks "what happened to this payment?"
+
+Immutable event logs — not record overwrites — are the right data model for financial state. `updated_at` on a record tells you when it was last touched. An event log tells you the complete history.
+
+## Never store more than you need
+
+Payment systems handle sensitive financial data. The principle of data minimization is both a security practice and a compliance requirement: store only what you need to complete the business function.
+
+Card numbers: never. Full account numbers: rarely. Transaction reference IDs from the gateway: always, but that's all you need to look up details from the provider.
+
+Store what you need for reconciliation, reporting, and customer support. Store nothing beyond that.
+
+## Reconciliation is a first-class feature
+
+The end-of-day reconciliation process — comparing your system's records against the gateway's records — is not an operational nicety. It's a data integrity check. If your records and the gateway's records don't agree, something went wrong, and you need to know what.
+
+I build reconciliation into the payment system design from the start: a structured reconciliation report generated nightly, with explicit handling for:
+- Records in your system with no match in the gateway
+- Records in the gateway with no match in your system
+- Records that match on ID but differ on amount or status
+
+Each category has a defined review process, not just an alert.
+
+{/* TODO: Add specific examples from your experience that you're comfortable sharing */}
+
+## The happy path is the minority
+
+When you look at payment gateway documentation, the happy path is prominently featured. Initiate → process → confirm. Three steps, three status codes.
+
+In production, you encounter: timeouts on initiation, successful initiations that never get confirmed, confirmed payments that get reversed, chargebacks, currency conversion errors, gateway outages, and responses that don't match the documented format.
+
+Design for the unhappy path first. Ask "what happens if this fails?" before asking "what happens when this succeeds?" The happy path code is easy. The resilient code is the job.

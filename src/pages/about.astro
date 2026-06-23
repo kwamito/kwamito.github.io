@@ -1,0 +1,135 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import CTASection from '../components/home/CTASection.astro';
+
+const values = [
+  {
+    title: 'Reliability over cleverness',
+    body: 'The most important property of a production system is that it works — consistently, predictably, even at 2am on a public holiday. I design for the failure modes first.',
+  },
+  {
+    title: 'Observability from day one',
+    body: 'A system you cannot see is a system you cannot trust. Logging, structured errors, and monitoring are not afterthoughts — they are part of the design.',
+  },
+  {
+    title: 'Simple architectures that scale',
+    body: 'The right tool is usually the boring tool. I reach for complexity only when simplicity has genuinely run out of room.',
+  },
+  {
+    title: 'Documentation as a first-class concern',
+    body: 'A well-documented API and a clear README are forms of respect for the people who come after you — including future you.',
+  },
+];
+---
+
+<Layout
+  title="About"
+  description="Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. How I got here, how I work, and what I believe about building software."
+>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+    <!-- Header -->
+    <div class="mb-16 animate-fade-up">
+      <p class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-4">
+        about
+      </p>
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-6">
+        Building software in Ghana,<br />for the world.
+      </h1>
+      <p class="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
+        I'm Nana Kwame Oparrey Kuhney — a backend engineer based in Accra, Ghana. I design and build the parts of software systems that people don't see but depend on every day.
+      </p>
+    </div>
+
+    <!-- Story -->
+    <div class="prose-content space-y-6 mb-16 animate-fade-up delay-100">
+      <h2>Who I am</h2>
+      <p>
+        My work lives at the intersection of APIs, data systems, and cloud infrastructure. I've built payment processing systems that move real money, government-grade service platforms that citizens depend on, and reporting pipelines that give teams visibility into what their systems are actually doing.
+      </p>
+      <p>
+        I currently work as Lead Backend Engineer at
+        <strong>Effect Studios Limited</strong>, where I own the backend
+        architecture and production operations for several platforms — including
+        a national-scale payment system that processes tens of thousands of
+        transactions every day.
+      </p>
+      <p>
+        I'm based in Ghana, and I think that context matters. Building systems
+        for West African infrastructure — the network conditions, the payment
+        ecosystem, the regulatory environment — has sharpened my instincts in
+        ways that purely academic environments can't replicate.
+      </p>
+
+      <h2>How I work</h2>
+      <p>
+        I believe good engineering is a discipline, not a talent. It shows up in the things you choose to prioritize before the system breaks, not after:
+      </p>
+    </div>
+
+    <!-- Engineering values grid -->
+    <div class="grid sm:grid-cols-2 gap-4 mb-16 animate-fade-up delay-200">
+      {values.map((v) => (
+        <div class="p-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl">
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-sm">
+            {v.title}
+          </h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            {v.body}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Background section -->
+    <div class="prose-content mb-16 animate-fade-up delay-300">
+      <h2>Background</h2>
+      <p>
+        I didn't follow a traditional path into engineering. I learned to build software by building software — starting with personal projects, moving to freelance work, and eventually taking on production responsibility at a company where the stakes were real and the margin for error was narrow.
+      </p>
+      <p>
+        That path gave me something a classroom rarely does: an early understanding of what it means for a system to fail in production, and the habit of designing so it doesn't. I've debugged slow queries at midnight, traced payment failures through distributed logs, and learned that "it works on my machine" is not a deployment strategy.
+      </p>
+      <p>
+        I'm a continuous learner — not because I'm trying to keep up with trends, but because the problems I work on keep getting more interesting and I like being equipped to solve them properly.
+      </p>
+
+      <h2>Outside of work</h2>
+      {/* TODO: Add a few personal details here — hobbies, interests, etc. */}
+      <p>
+        When I'm not building systems, I'm usually thinking about them. I read widely on distributed systems, database internals, and API design. I believe the best engineers are also good writers — clarity of thought and clarity of communication are the same skill.
+      </p>
+    </div>
+
+    <!-- Quick facts -->
+    <div class="p-6 bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl animate-fade-up delay-400">
+      <h3 class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-5">
+        quick facts
+      </h3>
+      <dl class="grid sm:grid-cols-2 gap-4">
+        {[
+          { label: 'Location', value: 'Accra, Ghana' },
+          { label: 'Current role', value: 'Lead Backend Engineer, Effect Studios' },
+          { label: 'Primary stack', value: 'Python · Django · PostgreSQL · GCP' },
+          { label: 'Interests', value: 'Distributed systems, API design, performance' },
+          { label: 'Open to', value: 'New opportunities & interesting problems' }, // TODO: update as needed
+          { label: 'Languages', value: 'English, Twi' }, // TODO: update
+        ].map(({ label, value }) => (
+          <div>
+            <dt class="font-mono text-xs text-slate-500 dark:text-slate-500 mb-0.5">{label}</dt>
+            <dd class="text-sm font-medium text-slate-800 dark:text-slate-200">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+
+  <CTASection
+    title="Want to know more?"
+    subtitle="I'm happy to talk about my experience, how I work, and what I'm looking for. Let's have a conversation."
+    primaryLabel="Get In Touch"
+    primaryHref="/contact"
+    secondaryLabel="View My Work"
+    secondaryHref="/projects"
+  />
+</Layout>

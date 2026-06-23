@@ -1,0 +1,143 @@
+---
+title: "PostgreSQL Patterns I Use in Every Project"
+description: "A practical reference for the PostgreSQL features and patterns I reach for consistently when building Django backends — indexes, constraints, materialized views, and query analysis."
+date: 2023-11-08
+tags: ["PostgreSQL", "Django", "Performance", "Database"]
+draft: false
+---
+
+After working with PostgreSQL across multiple production systems, there are patterns I reach for consistently. This is my personal reference — what I actually use, not an exhaustive survey of what PostgreSQL can do.
+
+## Use `select_related` and `prefetch_related` — always
+
+Django's ORM generates a SQL query per relationship by default. A view that renders a list of 50 transactions, each with a related account and user, will generate 101+ queries without explicit prefetching.
+
+```python
+# Generates N+1 queries
+transactions = Transaction.objects.all()
+for tx in transactions:
+    print(tx.account.name)  # one query per transaction
+
+# Generates 2 queries
+transactions = Transaction.objects.select_related('account').all()
+```
+
+`select_related` is for ForeignKey relationships (JOIN-based). `prefetch_related` is for ManyToMany and reverse FK relationships (separate IN query). Know which to use and use them consistently.
+
+## Partial indexes for common filter patterns
+
+If you frequently query a table with a WHERE clause filtering on a specific value, a partial index is more efficient than a full column index:
+
+```sql
+-- Full index: indexes all rows
+CREATE INDEX idx_transactions_status ON transactions(status);
+
+-- Partial index: only indexes pending rows — much smaller, faster for this query
+CREATE INDEX idx_transactions_pending ON transactions(created_at)
+WHERE status = 'pending';
+```
+
+I use partial indexes for status-filtered queues (pending tasks, unreviewed applications) where one value represents a fraction of total records.
+
+## Composite indexes match query patterns
+
+An index on `(a, b)` can satisfy queries filtering on `a`, or on `(a, b)` together, but not on `b` alone. Design composite indexes to match the actual queries you run, in the right column order.
+
+```sql
+-- Supports: WHERE user_id = ?
+--           WHERE user_id = ? AND created_at >= ?
+CREATE INDEX idx_txn_user_date ON transactions(user_id, created_at DESC);
+```
+
+In Django, add these in your model's `Meta`:
+```python
+class Meta:
+    indexes = [
+        models.Index(fields=['user_id', '-created_at'], name='idx_txn_user_date'),
+    ]
+```
+
+## EXPLAIN ANALYZE before optimizing
+
+Never guess about query performance. `EXPLAIN ANALYZE` shows you the actual execution plan, estimated vs actual row counts, and time spent at each step.
+
+```sql
+EXPLAIN ANALYZE
+SELECT * FROM transactions
+WHERE status = 'pending' AND created_at >= '2024-01-01';
+```
+
+Look for:
+- `Seq Scan` on large tables — may need an index
+- Estimated rows vs actual rows diverging widely — statistics may be stale (`ANALYZE` the table)
+- Slow sort operations — may benefit from an index on the ORDER BY column
+
+## Materialized views for reporting
+
+For aggregate reports that are expensive to compute in real time, materialized views pre-compute the results and store them as a table:
+
+```sql
+CREATE MATERIALIZED VIEW daily_transaction_summary AS
+SELECT
+    date_trunc('day', created_at) AS day,
+    payment_method,
+    COUNT(*) AS transaction_count,
+    SUM(amount) AS total_amount
+FROM transactions
+WHERE status = 'confirmed'
+GROUP BY 1, 2;
+
+-- Unique index required for CONCURRENTLY refresh
+CREATE UNIQUE INDEX ON daily_transaction_summary(day, payment_method);
+```
+
+Refresh without blocking reads:
+```sql
+REFRESH MATERIALIZED VIEW CONCURRENTLY daily_transaction_summary;
+```
+
+In Django, query it as a raw SQL query or map it to an unmanaged model.
+
+## Database constraints over application validation
+
+Application-layer validation can be bypassed — bulk updates via `queryset.update()`, direct database imports, bugs in validation logic. Database constraints cannot be bypassed.
+
+```python
+class Transaction(models.Model):
+    amount = models.DecimalField(
+        max_digits=19,
+        decimal_places=4,
+        validators=[MinValueValidator(Decimal('0.01'))],  # app-layer
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(amount__gt=0),
+                name='transaction_amount_positive',  # db-layer
+            )
+        ]
+```
+
+Use both: application validation gives user-friendly error messages, database constraints guarantee integrity.
+
+## `select_for_update()` for concurrent writes
+
+When multiple processes might update the same record concurrently, use `select_for_update()` to acquire a row-level lock:
+
+```python
+with transaction.atomic():
+    tx = Transaction.objects.select_for_update().get(id=tx_id)
+    if tx.status != 'pending':
+        raise ValueError("Transaction already processed")
+    tx.status = 'confirmed'
+    tx.save()
+```
+
+This is the right tool for payment state transitions, inventory updates, and anywhere you need "check then write" to be atomic.
+
+---
+
+PostgreSQL rewards understanding how it works, not just how to query it. Reading the `EXPLAIN ANALYZE` output, understanding the planner's statistics, and knowing when to add an index (and when not to) have been more valuable than knowing every SQL keyword.
+
+{/* TODO: Add any specific examples from your own experience */}

@@ -1,0 +1,106 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import ExperienceTimeline from '../components/ExperienceTimeline.astro';
+import CTASection from '../components/home/CTASection.astro';
+
+// TODO: Add additional roles if/when applicable
+const roles = [
+  {
+    title: 'Lead Backend Engineer',
+    company: 'Effect Studios Limited',
+    period: '2022 — Present',
+    location: 'Accra, Ghana',
+    type: 'Full-time',
+    current: true,
+    highlights: [
+      'Designed and built a national-scale payment and transaction processing platform handling 10,000+ daily transactions, including automated reconciliation, multi-gateway routing, and real-time reporting.',
+      'Architected and delivered the backend for a government Driver and Vehicle Licensing Services platform, serving citizens at national scale with strict data integrity and compliance requirements.',
+      'Built a reporting and analytics engine using PostgreSQL materialized views, reducing report generation time from minutes to seconds for high-volume data workloads.',
+      'Led migration of core services to Google Cloud Platform (Cloud Run + Cloud SQL), implementing zero-downtime deployment pipelines with GitHub Actions and Docker.',
+      'Implemented observability stack using GlitchTip (Sentry-compatible) for error tracking, structured logging, and production performance monitoring across all services.',
+      'Introduced API security best practices across the platform: token-based authentication, signed URLs for asset access, secret rotation via GCP Secret Manager, and rate limiting.',
+      'Mentored junior developers on Django best practices, code review discipline, API design, and production operations responsibility.',
+      'Defined backend engineering standards, documentation practices, and onboarding processes for the engineering team.',
+    ],
+    tags: [
+      'Python',
+      'Django',
+      'DRF',
+      'PostgreSQL',
+      'GCP',
+      'Cloud Run',
+      'Cloud SQL',
+      'Docker',
+      'GitHub Actions',
+      'Celery',
+      'Redis',
+      'GlitchTip',
+      'REST APIs',
+    ],
+  },
+  // TODO: Add earlier roles here if applicable
+];
+---
+
+<Layout
+  title="Experience"
+  description="Career history of Nana Kwame Oparrey Kuhney — Lead Backend Engineer at Effect Studios Limited. Production systems, APIs, payments, and cloud infrastructure."
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+    <SectionHeading
+      label="experience"
+      title="Where I've built things."
+      subtitle="A record of production responsibility — not just job titles."
+    />
+
+    <ExperienceTimeline roles={roles} />
+
+    <!-- Education / Learning -->
+    <div class="mt-20">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 tracking-tight">
+        How I learned
+      </h2>
+      <div class="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl p-6 md:p-8">
+        <div class="flex gap-4">
+          <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-2">Self-directed learning + production experience</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+              My engineering foundation is built on self-directed study, practical projects, and real production experience. I've learned more from debugging a payment processing bug at midnight than from any formal curriculum.
+            </p>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Continuous learning isn't a line on my CV — it's how I've gotten to where I am. I study database internals, follow releases of the frameworks I use, read post-mortems from companies running at scale, and build things to test ideas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CV download -->
+    <div class="mt-10 flex gap-4 items-center">
+      <a
+        href="/cv.pdf"
+        download
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm text-sm"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download CV / Resume
+      </a>
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-2 px-5 py-2.5 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-900 font-medium rounded-lg transition-colors text-sm"
+      >
+        Get In Touch
+      </a>
+    </div>
+  </div>
+
+  <CTASection />
+</Layout>

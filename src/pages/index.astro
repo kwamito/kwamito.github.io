@@ -1,0 +1,152 @@
+---
+import Layout from '../components/layout/Layout.astro';
+import Hero from '../components/home/Hero.astro';
+import StatsStrip from '../components/home/StatsStrip.astro';
+import CTASection from '../components/home/CTASection.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import BlogCard from '../components/BlogCard.astro';
+import SkillCard from '../components/SkillCard.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const featuredProjects = allProjects
+  .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99))
+  .slice(0, 3);
+
+const allPosts = await getCollection('writing', ({ data }) => !data.draft);
+const latestPosts = allPosts
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const coreSkills = [
+  {
+    icon: 'backend' as const,
+    title: 'Core Backend',
+    description: 'Python & Django ecosystem',
+    skills: ['Python', 'Django', 'DRF', 'REST APIs', 'Celery'],
+  },
+  {
+    icon: 'database' as const,
+    title: 'Databases',
+    description: 'PostgreSQL & data modeling',
+    skills: ['PostgreSQL', 'Query optimization', 'Indexing', 'Materialized views'],
+  },
+  {
+    icon: 'cloud' as const,
+    title: 'Cloud & Infrastructure',
+    description: 'GCP & container deployments',
+    skills: ['GCP', 'Cloud Run', 'Cloud SQL', 'Docker', 'GitHub Actions'],
+  },
+];
+---
+
+<Layout
+  title="Home"
+  description="Nana Kwame Oparrey Kuhney — Backend engineer based in Ghana. I build reliable, scalable production systems: payment platforms, APIs, and cloud infrastructure."
+>
+  <Hero />
+  <StatsStrip />
+
+  <!-- Featured Projects -->
+  <section class="py-20 max-w-6xl mx-auto px-4 sm:px-6">
+    <SectionHeading
+      label="case studies"
+      title="Production systems I've built."
+      subtitle="Not side projects — real systems handling real load, real money, and real consequences."
+    />
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {featuredProjects.map((project) => (
+        <ProjectCard
+          title={project.data.title}
+          description={project.data.description}
+          problem={project.data.problem}
+          impact={project.data.impact}
+          tags={project.data.tags}
+          slug={project.id}
+          featured={project.data.featured}
+        />
+      ))}
+    </div>
+
+    <div class="mt-10 text-center">
+      <a
+        href="/projects"
+        class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+      >
+        View all case studies
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Skills snapshot -->
+  <section class="py-16 bg-slate-50/80 dark:bg-gray-900/30 border-y border-slate-200 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <SectionHeading
+        label="skills"
+        title="What I work with."
+        subtitle="Tools I use daily, not just things I've touched once."
+      />
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {coreSkills.map((s) => (
+          <SkillCard
+            title={s.title}
+            description={s.description}
+            skills={s.skills}
+            icon={s.icon}
+          />
+        ))}
+      </div>
+      <div class="mt-8">
+        <a
+          href="/skills"
+          class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+        >
+          See full skills breakdown
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest writing -->
+  {latestPosts.length > 0 && (
+    <section class="py-20 max-w-6xl mx-auto px-4 sm:px-6">
+      <SectionHeading
+        label="writing"
+        title="Notes from the backend."
+        subtitle="Practical lessons from building and running production systems."
+      />
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {latestPosts.map((post) => (
+          <BlogCard
+            title={post.data.title}
+            description={post.data.description}
+            date={post.data.date}
+            tags={post.data.tags}
+            slug={post.id}
+          />
+        ))}
+      </div>
+      <div class="mt-8">
+        <a
+          href="/writing"
+          class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+        >
+          Read all articles
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <CTASection />
+</Layout>

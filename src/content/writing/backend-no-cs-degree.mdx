@@ -1,0 +1,57 @@
+---
+title: "You Don't Need a CS Degree to Build Production Systems"
+description: "My experience learning backend engineering without a traditional computer science background — what worked, what didn't, and what I think actually matters."
+date: 2023-09-05
+tags: ["Career", "Learning", "Backend Engineering"]
+draft: false
+---
+
+I didn't study computer science. I've never sat in a lecture on data structures, operating systems, or compiler theory. The way I learned to write software was by writing software.
+
+I now build and maintain production backend systems — a national payment processing platform handling tens of thousands of transactions a day, government-grade APIs, and cloud infrastructure that has to work when it's supposed to.
+
+This is not a story about how the degree doesn't matter. It's about what does.
+
+## What I learned first
+
+My early programming was exploratory and undisciplined. I built things that worked in the sense that they did what I wanted, without much understanding of *why* they worked or what would happen when they broke.
+
+The first shift came when I started working on real projects — not tutorials, not demos, but things other people were going to use. The quality bar changes immediately. "It works on my machine" is no longer enough. You have to think about error states, about what happens when the input is unexpected, about what you'll do at 11pm when something breaks.
+
+That pressure is an excellent teacher.
+
+## The theory gap is real — and fillable
+
+I didn't learn about time complexity from a textbook. I learned it when a `O(n²)` search inside a loop brought a production feature to its knees under real data volumes. I had to understand what was happening and fix it in a system that couldn't go down.
+
+There's a genuine gap when you don't have CS fundamentals. You might not recognize a problem as a graph traversal problem. You might not know that a hash map is the right data structure here. You might reach for a nested loop when a two-pointer approach would be obviously better to someone with a different background.
+
+The good news: this gap is fillable. Not in a weekend, but consistently over time. Books like *Designing Data-Intensive Applications* by Martin Kleppmann, deep dives into PostgreSQL internals, reading language and framework source code — these fill in theory in context, which I've found more durable than theory in the abstract.
+
+## What actually matters in production work
+
+After a few years building production systems, the things I've found most valuable are not what I expected:
+
+**Reading error messages carefully.** This sounds trivial. It isn't. A huge amount of debugging time is wasted by people who don't read the full traceback before forming a hypothesis. The error message usually tells you exactly what's wrong if you take the time to read it.
+
+**Understanding the stack below your abstraction.** Django abstracts the SQL query, but you still need to understand what SQL is being generated and why it might be slow. The Cloud Run platform abstracts the server, but you still need to understand container lifecycle and connection management. Abstractions don't remove complexity — they move it. Knowing what's under the abstraction lets you use it correctly.
+
+**Being comfortable in the terminal.** Production systems are managed from the command line. Being confident with `ssh`, process management, log tailing, database CLI tools, and shell scripting makes a real difference in how quickly you can operate under pressure.
+
+**Writing clearly.** The most effective engineers I've observed write clearly — in commit messages, in pull request descriptions, in documentation, in the comments they leave when something is non-obvious. Writing clearly is a discipline that compounds over time.
+
+**Asking specific questions.** "This doesn't work" is not a question. "This code produces X but I expected Y, and when I add a print statement at line 42 I see Z — can you help me understand why?" is a question that will get you a useful answer. Asking specific, well-framed questions is a learnable skill.
+
+## What I'd tell someone starting now
+
+Build something real. Not a tutorial. Something small but genuinely useful — a personal project that does something you actually want. Deploy it somewhere. Break it. Fix it. Add a feature that requires you to restructure what you already built.
+
+Then build something for someone else to use. The quality bar shifts the moment another person is depending on your work.
+
+Read the documentation for the tools you use — all of it, not just the quickstart. The answers to most of the intermediate-level questions you will have are in the documentation you skipped.
+
+And don't catastrophize the theory gap. The people who hired me to build systems that move real money did not ask me for my exam results. They asked me about the hardest problem I'd ever debugged, about how I'd approach a system they were describing, and about what I'd do differently on a project I'd built.
+
+Those are the questions that matter.
+
+{/* TODO: Feel free to personalize this further with your own specific experiences */}

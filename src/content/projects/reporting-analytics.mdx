@@ -1,0 +1,64 @@
+---
+title: "Reporting & Analytics Engine"
+description: "A backend reporting system that transforms raw transaction and operational data into fast, accurate management dashboards — powered by PostgreSQL materialized views and a structured data pipeline."
+problem: "As data volume grew, ad-hoc database queries backing management reports started taking minutes to complete, blocking the admin interface during business hours and creating pressure to skip reporting entirely."
+impact: "Reporting queries went from 2–5 minute runtimes to under 500ms. Dashboard data is now always fresh, always fast, and never blocks application performance."
+tags: ["Python", "Django", "PostgreSQL", "Materialized views", "Celery", "REST API", "GCP"]
+order: 3
+featured: false
+---
+
+## Overview
+
+As the payment platform grew in transaction volume, the management reporting layer hit a wall. Reports that worked fine at 10,000 records started timing out at 500,000. The admin interface would block for minutes while report queries ran. The solution wasn't faster hardware — it was rethinking where and how the aggregations happened.
+
+This project is the reporting subsystem: a set of data pipelines, materialized views, and API endpoints that provide fast, accurate management reporting without impacting the transactional system.
+
+## The Challenge
+
+The fundamental tension in reporting against a transactional database is this: transactional workloads are optimized for row-level operations (read one record, write one record), while reporting workloads need to scan, aggregate, and join across large sets of records. Running both workloads on the same table with the same indexes is a losing trade-off.
+
+Specific problems:
+
+- Transaction summary reports aggregated across date ranges, payment methods, and services — joining multiple tables at query time
+- Heavy GROUP BY and aggregate operations that held locks and competed with write traffic
+- Report queries that returned correctly but slowly — 2 to 5 minutes for monthly summaries
+- No caching strategy — every admin page load re-ran the full query
+
+## Architecture
+
+**Materialized views as the reporting layer:**
+I built a set of PostgreSQL materialized views that pre-aggregate the most common reporting dimensions: daily totals by service, payment method, and gateway; monthly summaries; and cumulative totals with running comparisons.
+
+The views are refreshed on a schedule via Celery — nightly for daily summaries, hourly for intraday snapshots. The refresh is non-blocking in PostgreSQL (`REFRESH MATERIALIZED VIEW CONCURRENTLY`) — the old data remains queryable during the refresh.
+
+**Tiered report data:**
+Not all reports have the same freshness requirements. I tiered them:
+- **Real-time counts** (transaction count for today so far): served from a lightweight indexed query on the live table, refreshed on page load
+- **Intraday summaries**: served from an hourly-refreshed materialized view
+- **Historical reports**: served from a nightly-refreshed materialized view, with the refresh timestamp exposed to users so they know how current the data is
+
+**API design for reporting:**
+The reporting API uses query parameters to express the report type, date range, and grouping dimensions. The backend maps these to the appropriate materialized view or query. Report endpoints return structured JSON with totals, breakdowns, and metadata (report generated at, data as of, etc.).
+
+## Technical Highlights
+
+**REFRESH MATERIALIZED VIEW CONCURRENTLY:**
+Standard `REFRESH MATERIALIZED VIEW` takes an exclusive lock on the view, blocking all reads. The CONCURRENTLY variant creates a new version in the background and swaps atomically — no blocking. The requirement is a unique index on the view, which I added on the primary key of the underlying table.
+
+**Index design for reporting queries:**
+Even materialized views need the right indexes. I added composite indexes on `(date, service_type)`, `(payment_method, date)`, and `(status, created_at)` — matching the most common filter combinations in management reports. `EXPLAIN ANALYZE` before and after confirmed index usage.
+
+**Separating report reads from transactional writes:**
+On GCP Cloud SQL, I configured a read replica and pointed the reporting API endpoints at it. Transactional writes go to the primary. Report reads go to the replica. This eliminated the read/write contention entirely during peak hours.
+
+**Django management commands for backfills:**
+When I added a new materialized view, I needed to populate it with historical data. I wrote Django management commands to backfill data in configurable batch sizes, with progress logging and the ability to resume from a checkpoint if the command was interrupted.
+
+## What I Learned
+
+Database performance work is grounded in measurement. I spent time with `EXPLAIN ANALYZE`, `pg_stat_statements`, and slow query logs before writing a single line of application code. Understanding where time was actually being spent — sequential scans, sort operations, join strategies — told me exactly what to change.
+
+Materialized views are one of PostgreSQL's most underused features for this kind of problem. They're not a cache — they're a first-class database object with their own statistics and query planner support.
+
+{/* TODO: Add specific numbers if comfortable sharing (rows processed, view sizes, etc.) */}
