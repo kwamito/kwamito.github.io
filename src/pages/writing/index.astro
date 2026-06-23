@@ -6,6 +6,15 @@ import { getCollection } from 'astro:content';
 
 const posts = await getCollection('writing', ({ data }) => !data.draft);
 const sorted = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Collect all unique tags
+const allTags = [...new Set(sorted.flatMap((p) => p.data.tags ?? []))].sort();
+
+// Estimate reading time per post
+function readingTime(body: string) {
+  const words = body.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
 ---
 
 <Layout
@@ -19,22 +28,97 @@ const sorted = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf(
       subtitle="Practical lessons from building and running production systems. No fluff, no hot takes — just things I've actually learned."
     />
 
+    <!-- Tag filter -->
+    {allTags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-10" role="group" aria-label="Filter by tag">
+        <button
+          class="tag-filter active px-3 py-1 rounded-full text-xs font-mono font-medium border transition-colors
+                 border-blue-600 bg-blue-600 text-white
+                 hover:bg-blue-700"
+          data-tag="all"
+        >
+          all
+        </button>
+        {allTags.map((tag) => (
+          <button
+            class="tag-filter px-3 py-1 rounded-full text-xs font-mono font-medium border transition-colors
+                   border-slate-200 dark:border-gray-700 text-slate-600 dark:text-slate-400
+                   hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400"
+            data-tag={tag}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    )}
+
     {sorted.length === 0 ? (
       <div class="text-center py-20 text-slate-500 dark:text-slate-500">
         <p class="font-mono text-sm">No posts yet. Check back soon.</p>
       </div>
     ) : (
-      <div class="grid sm:grid-cols-2 gap-5">
+      <div id="posts-grid" class="grid sm:grid-cols-2 gap-5">
         {sorted.map((post) => (
-          <BlogCard
-            title={post.data.title}
-            description={post.data.description}
-            date={post.data.date}
-            tags={post.data.tags}
-            slug={post.id}
-          />
+          <div
+            class="post-card"
+            data-tags={JSON.stringify(post.data.tags ?? [])}
+          >
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              date={post.data.date}
+              tags={post.data.tags}
+              slug={post.id}
+              readingTime={readingTime(post.body ?? '')}
+            />
+          </div>
         ))}
       </div>
+
+      <p id="no-results" class="hidden text-center py-12 text-sm text-slate-500 dark:text-slate-500 font-mono">
+        No posts match that tag.
+      </p>
     )}
   </div>
 </Layout>
+
+<script>
+  function initTagFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.tag-filter');
+    const cards = document.querySelectorAll<HTMLElement>('.post-card');
+    const noResults = document.getElementById('no-results');
+    let active = 'all';
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        active = btn.dataset.tag ?? 'all';
+
+        // Update button styles
+        buttons.forEach((b) => {
+          const isActive = b.dataset.tag === active;
+          b.classList.toggle('bg-blue-600', isActive);
+          b.classList.toggle('text-white', isActive);
+          b.classList.toggle('border-blue-600', isActive);
+          b.classList.toggle('border-slate-200', !isActive);
+          b.classList.toggle('dark:border-gray-700', !isActive);
+          b.classList.toggle('text-slate-600', !isActive);
+          b.classList.toggle('dark:text-slate-400', !isActive);
+        });
+
+        // Filter cards
+        let visible = 0;
+        cards.forEach((card) => {
+          const tags: string[] = JSON.parse(card.dataset.tags ?? '[]');
+          const show = active === 'all' || tags.includes(active);
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        noResults?.classList.toggle('hidden', visible > 0);
+      });
+    });
+  }
+
+  initTagFilter();
+  document.addEventListener('astro:after-swap', initTagFilter);
+</script>

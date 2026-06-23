@@ -9,36 +9,42 @@ const skillGroups = [
     icon: 'backend' as const,
     title: 'Core Backend',
     description: 'The tools I think in — daily drivers for APIs, business logic, and data processing.',
+    depth: '3+ years · 5+ production systems · primary daily stack',
     skills: ['Python 3', 'Django', 'Django REST Framework', 'Celery', 'REST API design', 'Async tasks', 'Webhooks', 'Background jobs'],
   },
   {
     icon: 'database' as const,
     title: 'Databases & Storage',
     description: 'Where the truth lives. Query correctness and performance are non-negotiable.',
+    depth: '3+ years PostgreSQL · optimized for 500K+ record workloads',
     skills: ['PostgreSQL', 'Query optimization', 'Indexing strategies', 'Materialized views', 'Transactions', 'Data modeling', 'Migrations', 'Google Cloud Storage'],
   },
   {
     icon: 'cloud' as const,
     title: 'Cloud & Infrastructure',
     description: 'GCP-native deployments, managed services, and container orchestration.',
+    depth: '2+ years GCP · production deployments on Cloud Run + Cloud SQL',
     skills: ['Google Cloud Platform', 'Cloud Run', 'Cloud SQL', 'Cloud Storage', 'Secret Manager', 'Pub/Sub', 'Docker', 'Container Registry'],
   },
   {
     icon: 'cicd' as const,
     title: 'CI/CD & Automation',
-    description: 'Reliable, repeatable deployments that I don\'t have to think about.',
+    description: "Reliable, repeatable deployments that I don't have to think about.",
+    depth: 'Automated pipelines across all production services',
     skills: ['GitHub Actions', 'Docker builds', 'Automated testing pipelines', 'Zero-downtime deploys', 'Environment promotion', 'Secrets in CI'],
   },
   {
     icon: 'observability' as const,
     title: 'Observability & Reliability',
     description: 'You can only trust a system you can see. Monitoring is part of the design, not an afterthought.',
+    depth: 'Production monitoring across payment + government platforms',
     skills: ['Sentry / GlitchTip', 'Structured logging', 'Error tracking', 'Performance profiling', 'Slow query analysis', 'Health checks', 'Alerts'],
   },
   {
     icon: 'security' as const,
     title: 'Security',
     description: 'Secure by default — authentication, secrets management, and API hardening.',
+    depth: 'Financial & government systems · zero tolerance for misconfigs',
     skills: ['Token-based auth', 'OAuth 2.0', 'Signed URLs', 'GCP Secret Manager', 'API rate limiting', 'HTTPS enforcement', 'Secrets rotation', 'CORS policy'],
   },
 ];
@@ -66,6 +72,7 @@ const alsoKnow = [
       {skillGroups.map((group) => (
         <SkillCard
           title={group.title}
+          depth={group.depth}
           description={group.description}
           skills={group.skills}
           icon={group.icon}
