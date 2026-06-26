@@ -72,6 +72,16 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(ogImage, Astro.site ?? siteUrl)} />
+
+    <!-- Analytics: Plausible -->
+    <!-- TODO: Sign up at https://plausible.io and add kwamito.github.io as a site.
+         If you use a custom domain later, update data-domain to match. -->
+    <script
+      defer
+      data-domain="kwamito.github.io"
+      src="https://plausible.io/js/script.js"
+      is:inline
+    ></script>
   </head>
 
   <body class="bg-slate-50 text-slate-900 dark:bg-gray-950 dark:text-slate-100 transition-colors duration-200">
