@@ -2,6 +2,7 @@
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import ExperienceTimeline from '../components/ExperienceTimeline.astro';
+import ClosingLine from '../components/ui/ClosingLine.astro';
 import { site } from '../config/site';
 
 // TODO: Add additional roles if/when applicable
@@ -60,6 +61,7 @@ const roles = [
         label="Experience"
         title="Where I've built things."
         subtitle="Backend architecture and production operations for scholarship, reporting and cloud platforms."
+        class="mb-12"
       />
     </header>
 
@@ -69,28 +71,17 @@ const roles = [
 
     <section class="border-t border-line py-16">
       <h2 class="text-heading text-fg mb-6">Background</h2>
-      <div class="space-y-5 text-[1.0625rem] leading-[1.75] text-muted">
+      <div class="space-y-5 text-body-lg text-muted">
         <p>
           My foundation is self-directed study and production work. I study database internals, follow releases of the frameworks I use, read other teams' post-mortems, and build things to test ideas.
         </p>
       </div>
     </section>
 
-    <section class="border-t border-line py-12">
-      <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
-        {site.cv && (
-          <a
-            href={site.cv}
-            download
-            class="inline-flex items-center gap-2 rounded-lg bg-fg text-canvas px-4 py-2.5 text-sm font-medium hover:opacity-90"
-          >
-            Download CV
-          </a>
-        )}
-        <p class="text-muted">
-          Hiring for a senior backend role? <a href="/contact/" class="link">Get in touch</a>
-        </p>
-      </div>
-    </section>
+    <ClosingLine lead="Hiring for a senior backend role?">
+      {site.cv && (
+        <a slot="actions" href={site.cv} download class="btn btn-primary">Download CV</a>
+      )}
+    </ClosingLine>
   </div>
 </Layout>

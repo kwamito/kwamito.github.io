@@ -2,11 +2,10 @@
 import Layout from '../../components/layout/Layout.astro';
 import SectionHeading from '../../components/ui/SectionHeading.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getSortedProjects } from '../../lib/content';
 
-const projects = await getCollection('projects');
-const sorted = projects.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
-const isPersonal = (p: (typeof projects)[number]) =>
+const sorted = await getSortedProjects();
+const isPersonal = (p: (typeof sorted)[number]) =>
   (p.data.role ?? '').toLowerCase().includes('personal project');
 const work = sorted.filter((p) => !isPersonal(p));
 const side = sorted.filter(isPersonal);
@@ -22,6 +21,7 @@ const side = sorted.filter(isPersonal);
       label="Projects"
       title="Systems I have built, written up as case studies."
       subtitle="Work systems (a scholarship platform, reporting and cloud infrastructure) and two local-first side projects. For each: the problem, how it is built, and what changed."
+      class="mb-12"
     />
 
     <div class="grid gap-6 md:grid-cols-2">
@@ -34,7 +34,6 @@ const side = sorted.filter(isPersonal);
             impact={project.data.impact}
             tags={project.data.tags}
             slug={project.id}
-            featured={project.data.featured}
             index={index + 1}
             size={index === 0 ? 'lead' : 'default'}
             metrics={project.data.metrics}
@@ -58,7 +57,6 @@ const side = sorted.filter(isPersonal);
                 impact={project.data.impact}
                 tags={project.data.tags}
                 slug={project.id}
-                featured={project.data.featured}
                 index={work.length + index + 1}
                 size="default"
               />

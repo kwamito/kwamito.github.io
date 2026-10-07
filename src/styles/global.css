@@ -75,6 +75,10 @@
   --text-heading--letter-spacing: -0.025em;
   --text-heading--font-weight: 600;
 
+  /* Long-form body copy on reading pages (about, experience). */
+  --text-body-lg: 1.0625rem;
+  --text-body-lg--line-height: 1.75;
+
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 

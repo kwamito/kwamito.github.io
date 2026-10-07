@@ -6,8 +6,6 @@ interface Props {
   impact: string;
   tags: string[];
   slug: string;
-  /** Accepted for backward compatibility; no longer rendered. */
-  featured?: boolean;
   /** 1-based position, rendered as a mono index (01, 02, …). */
   index?: number;
   /** 'lead' renders a wide two-column layout for the first case study. */
@@ -89,20 +87,5 @@ const tagLine = tags.slice(0, isLead ? 6 : 4).join(' · ');
 </article>
 
 <script>
-  // Whole-card click without overlaying the text: navigate via the card's single
-  // link unless the user is selecting text or clicked another interactive element.
-  const w = window as typeof window & { __cardClickBound?: boolean };
-  if (!w.__cardClickBound) {
-    w.__cardClickBound = true;
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement | null;
-      const card = target?.closest<HTMLElement>('[data-card]');
-      if (!card || target?.closest('a, button, input, select, textarea')) return;
-      if (window.getSelection()?.toString()) return;
-      const link = card.querySelector<HTMLAnchorElement>('[data-card-link]');
-      if (!link) return;
-      if (e.metaKey || e.ctrlKey) window.open(link.href, '_blank', 'noopener');
-      else link.click();
-    });
-  }
+  import '../scripts/card-click';
 </script>

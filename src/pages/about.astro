@@ -1,7 +1,15 @@
 ---
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
+import ClosingLine from '../components/ui/ClosingLine.astro';
 import { site } from '../config/site';
+import { compact } from '../lib/compact';
+
+interface Fact {
+  label: string;
+  value: string;
+  mono?: boolean;
+}
 
 const values = [
   {
@@ -22,18 +30,18 @@ const values = [
   },
 ];
 
-const facts = [
+const facts = compact<Fact>([
   site.location && { label: 'Location', value: site.location },
   { label: 'Role', value: 'Lead Backend Engineer, Effect Studios' },
   { label: 'Primary stack', value: 'Python · Django · PostgreSQL · GCP', mono: true },
   { label: 'Interests', value: 'Distributed systems, API design, performance' },
   site.availability && { label: 'Open to', value: site.availability },
   { label: 'Languages', value: 'English, Twi' }, // TODO: update
-].filter(Boolean) as { label: string; value: string; mono?: boolean }[];
+]);
 
 // Body copy for the reading sections. Not using .prose-content here:
 // its paragraph margins doubled up with space-y and left uneven gaps.
-const body = 'space-y-5 text-[1.0625rem] leading-[1.75] text-muted';
+const body = 'space-y-5 text-body-lg text-muted';
 const h2 = 'text-heading text-fg mb-6';
 ---
 
@@ -48,6 +56,7 @@ const h2 = 'text-heading text-fg mb-6';
         label="About"
         title="Building software in Ghana, for the world."
         subtitle="I'm Nana Kwame Oparrey Kuhney, a lead backend engineer based in Accra. I design and build the parts of software systems that people don't see but depend on every day."
+        class="mb-12"
       />
     </header>
 
@@ -116,10 +125,6 @@ const h2 = 'text-heading text-fg mb-6';
       </dl>
     </section>
 
-    <section class="border-t border-line py-12">
-      <p class="text-muted">
-        Want to talk about a role or a system? <a href="/contact/" class="link">Get in touch</a>
-      </p>
-    </section>
+    <ClosingLine lead="Want to talk about a role or a system?" />
   </div>
 </Layout>

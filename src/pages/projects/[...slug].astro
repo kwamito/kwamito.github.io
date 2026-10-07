@@ -1,11 +1,13 @@
 ---
 import Layout from '../../components/layout/Layout.astro';
-import { getCollection, render } from 'astro:content';
+import BackLink from '../../components/ui/BackLink.astro';
+import PrevNext from '../../components/ui/PrevNext.astro';
+import { render } from 'astro:content';
 import { site } from '../../config/site';
+import { getSortedProjects } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  const sorted = projects.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+  const sorted = await getSortedProjects();
   return sorted.map((project, index) => ({
     params: { slug: project.id },
     props: {
@@ -47,10 +49,7 @@ const metricCols: Record<number, string> = {
 
 <Layout title={title} description={description} jsonLd={jsonLd}>
   <article class="wrap py-16 sm:py-20">
-    <a href="/projects/" class="inline-flex items-center gap-2 text-sm text-muted hover:text-fg transition-colors">
-      <span aria-hidden="true" class="font-mono">←</span>
-      All projects
-    </a>
+    <BackLink href="/projects/" label="All projects" />
 
     <!-- Header -->
     <header class="mt-10 max-w-3xl">
@@ -171,28 +170,12 @@ const metricCols: Record<number, string> = {
       )}
     </div>
 
-    <!-- Prev / Next -->
-    <nav class="mt-20 grid grid-cols-2 gap-6 border-t border-line pt-8" aria-label="More case studies">
-      <div>
-        {prev && (
-          <a href={`/projects/${prev.id}/`} class="group block">
-            <span class="eyebrow">← Previous</span>
-            <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
-              {prev.data.title}
-            </span>
-          </a>
-        )}
-      </div>
-      <div class="text-right">
-        {next && (
-          <a href={`/projects/${next.id}/`} class="group block">
-            <span class="eyebrow">Next →</span>
-            <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
-              {next.data.title}
-            </span>
-          </a>
-        )}
-      </div>
-    </nav>
+    <PrevNext
+      label="More case studies"
+      prev={prev && { href: `/projects/${prev.id}/`, title: prev.data.title }}
+      next={next && { href: `/projects/${next.id}/`, title: next.data.title }}
+      prevLabel="← Previous"
+      nextLabel="Next →"
+    />
   </article>
 </Layout>

@@ -1,0 +1,21 @@
+---
+// Closing call to action at the foot of a page: "<lead> Get in touch".
+// Anything in the `actions` slot (e.g. a CV button) sits before the line.
+interface Props {
+  lead: string;
+}
+
+const { lead } = Astro.props;
+const hasActions = Astro.slots.has('actions');
+---
+
+<section class="border-t border-line py-12">
+  {hasActions ? (
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+      <slot name="actions" />
+      <p class="text-muted">{lead} <a href="/contact/" class="link">Get in touch</a></p>
+    </div>
+  ) : (
+    <p class="text-muted">{lead} <a href="/contact/" class="link">Get in touch</a></p>
+  )}
+</section>

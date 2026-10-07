@@ -1,18 +1,19 @@
 ---
 import { site } from '../../config/site';
+import StatusDot from '../ui/StatusDot.astro';
 ---
 
 <section class="pt-16 pb-20 sm:pt-24 sm:pb-28">
   <div class="wrap grid gap-14 lg:grid-cols-12 lg:gap-12 lg:items-center">
     <div class="lg:col-span-7 animate-fade-up">
       <p class="eyebrow flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span>Lead Backend Engineer</span>
+        <span>{site.role}</span>
         <span aria-hidden="true">·</span>
         <span>{site.location}</span>
         {site.availability && (
           <>
             <span class="flex basis-full items-center gap-2">
-              <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+              <StatusDot />
               {site.availability}
             </span>
           </>
@@ -32,7 +33,7 @@ import { site } from '../../config/site';
       <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
         <a
           href="/projects/"
-          class="inline-flex items-center rounded-lg bg-fg px-5 py-3 text-sm font-medium text-canvas transition-opacity hover:opacity-85"
+          class="btn btn-primary"
         >
           Read the case studies
         </a>

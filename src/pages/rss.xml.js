@@ -1,15 +1,13 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
 import { site as profile } from '../config/site';
+import { getPublishedPosts } from '../lib/content';
 
 export async function GET(context) {
-  const posts = (await getCollection('writing', ({ data }) => !data.draft)).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-  );
+  const posts = await getPublishedPosts();
 
   return rss({
     title: `Writing — ${profile.shortName}`,
-    description: `Notes on backend engineering from ${profile.name}, Lead Backend Engineer in ${profile.location}.`,
+    description: `Notes on backend engineering from ${profile.name}, ${profile.role} in ${profile.location}.`,
     site: context.site,
     trailingSlash: true,
     items: posts.map((post) => ({

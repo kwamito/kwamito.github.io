@@ -1,10 +1,10 @@
 ---
+import { formatDate } from '../lib/content';
+
 interface Props {
   title: string;
   description: string;
   date: Date;
-  /** Accepted for backward compatibility; filtering happens on the page. */
-  tags?: string[];
   slug: string;
   readingTime?: number; // minutes
 }
@@ -12,18 +12,12 @@ interface Props {
 const { title, description, date, slug, readingTime } = Astro.props;
 const href = `/writing/${slug}/`;
 
-const formattedDate = date.toLocaleDateString('en-GB', {
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-  timeZone: 'UTC',
-});
 ---
 
 <article data-card class="@container group cursor-pointer border-t border-line py-6">
   <div class="grid gap-2 @lg:grid-cols-[8.5rem_1fr] @lg:gap-6">
     <p class="font-mono text-xs leading-6 text-subtle tabular">
-      <time datetime={date.toISOString()}>{formattedDate}</time>
+      <time datetime={date.toISOString()}>{formatDate(date, 'short')}</time>
     </p>
     <div>
       <h3 class="text-base font-semibold leading-snug tracking-tight text-fg text-balance">
@@ -44,19 +38,5 @@ const formattedDate = date.toLocaleDateString('en-GB', {
 </article>
 
 <script>
-  // Shared with ProjectCard: navigate via the card's single link unless text is selected.
-  const w = window as typeof window & { __cardClickBound?: boolean };
-  if (!w.__cardClickBound) {
-    w.__cardClickBound = true;
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement | null;
-      const card = target?.closest<HTMLElement>('[data-card]');
-      if (!card || target?.closest('a, button, input, select, textarea')) return;
-      if (window.getSelection()?.toString()) return;
-      const link = card.querySelector<HTMLAnchorElement>('[data-card-link]');
-      if (!link) return;
-      if (e.metaKey || e.ctrlKey) window.open(link.href, '_blank', 'noopener');
-      else link.click();
-    });
-  }
+  import '../scripts/card-click';
 </script>

@@ -1,5 +1,7 @@
 ---
 import ThemeToggle from '../ui/ThemeToggle.astro';
+import StatusDot from '../ui/StatusDot.astro';
+import { site } from '../../config/site';
 
 const navLinks = [
   { href: '/about/', label: 'About' },
@@ -20,8 +22,8 @@ function isActive(href: string) {
   class="fixed top-0 left-0 right-0 z-50 border-b border-line bg-canvas/80 backdrop-blur-md backdrop-saturate-150"
 >
   <nav class="wrap h-16 flex items-center justify-between" aria-label="Main navigation">
-    <a href="/" class="flex items-baseline gap-2.5 rounded-sm" aria-label="Nana Kwame — home">
-      <span class="font-semibold tracking-tight text-fg">Nana Kwame</span>
+    <a href="/" class="flex items-baseline gap-2.5 rounded-sm" aria-label={`${site.shortName} — home`}>
+      <span class="font-semibold tracking-tight text-fg">{site.shortName}</span>
       <span class="hidden sm:inline font-mono text-xs text-subtle">backend engineer</span>
     </a>
 
@@ -79,7 +81,7 @@ function isActive(href: string) {
             aria-current={isActive(href) ? 'page' : undefined}
           >
             {label}
-            {isActive(href) && <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>}
+            {isActive(href) && <StatusDot />}
           </a>
         </li>
       ))}

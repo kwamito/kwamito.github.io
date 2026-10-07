@@ -1,0 +1,10 @@
+---
+// Small accent dot used for availability and the active mobile nav item.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['size-1.5 shrink-0 rounded-full bg-accent', className]} aria-hidden="true"></span>
