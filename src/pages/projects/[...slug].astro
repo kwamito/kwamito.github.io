@@ -1,6 +1,5 @@
 ---
 import Layout from '../../components/layout/Layout.astro';
-import Badge from '../../components/ui/Badge.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -10,115 +9,178 @@ export async function getStaticPaths() {
     params: { slug: project.id },
     props: {
       project,
+      position: index + 1,
+      total: sorted.length,
       prev: sorted[index - 1] ?? null,
       next: sorted[index + 1] ?? null,
     },
   }));
 }
 
-const { project, prev, next } = Astro.props;
-const { Content } = await render(project);
-const { title, description, problem, impact, tags } = project.data;
+const { project, position, total, prev, next } = Astro.props;
+const { Content, headings } = await render(project);
+const { title, description, problem, impact, tags, role, period, metrics, stack, links, screenshots } = project.data;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const stackList = stack ?? tags;
+const toc = headings.filter((h) => h.depth === 2);
+
+// Literal class names so Tailwind can see them.
+const metricCols: Record<number, string> = {
+  1: 'sm:grid-cols-1',
+  2: 'sm:grid-cols-2',
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-4',
+};
 ---
 
 <Layout title={title} description={description}>
-  <article class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-
-    <!-- Back link -->
-    <a
-      href="/projects"
-      class="inline-flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors mb-8 group"
-    >
-      <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
+  <article class="wrap py-16 sm:py-20">
+    <a href="/projects" class="inline-flex items-center gap-2 text-sm text-muted hover:text-fg transition-colors">
+      <span aria-hidden="true" class="font-mono">←</span>
       All projects
     </a>
 
     <!-- Header -->
-    <header class="mb-10">
-      <p class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-3">
-        case study
-      </p>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4">
-        {title}
-      </h1>
-      <p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-        {description}
-      </p>
-      <div class="flex flex-wrap gap-1.5">
-        {tags.map((tag) => (
-          <Badge label={tag} variant="default" />
-        ))}
-      </div>
+    <header class="mt-10 max-w-3xl">
+      <p class="eyebrow tabular">Case study {pad(position)} / {pad(total)}</p>
+      <h1 class="mt-4 text-title text-fg text-balance">{title}</h1>
+      <p class="mt-5 text-lg sm:text-xl text-muted leading-relaxed text-pretty">{description}</p>
     </header>
 
-    <!-- Problem / Impact summary card -->
-    <div class="grid sm:grid-cols-2 gap-4 mb-10 p-5 bg-slate-50 dark:bg-gray-900/60 border border-slate-200 dark:border-gray-800 rounded-xl">
-      <div>
-        <p class="font-mono text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1.5">The problem</p>
-        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{problem}</p>
+    <!-- Metadata rail -->
+    <dl class="mt-12 grid gap-x-10 gap-y-6 border-y border-line py-6 sm:grid-cols-[auto_auto_minmax(0,1fr)]">
+      {role && (
+        <div>
+          <dt class="eyebrow">Role</dt>
+          <dd class="mt-2 text-sm text-fg">{role}</dd>
+        </div>
+      )}
+      {period && (
+        <div>
+          <dt class="eyebrow">Period</dt>
+          <dd class="mt-2 text-sm text-fg tabular">{period}</dd>
+        </div>
+      )}
+      <div class:list={[!period && 'sm:col-span-2']}>
+        <dt class="eyebrow">Stack</dt>
+        <dd class="mt-2 flex flex-wrap font-mono text-[0.8125rem] leading-6 text-fg">
+          {stackList.map((item, i) => (
+            <span class="whitespace-nowrap">
+              {item}{i < stackList.length - 1 && <span class="text-subtle px-1.5" aria-hidden="true">/</span>}
+            </span>
+          ))}
+        </dd>
       </div>
-      <div>
-        <p class="font-mono text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1.5">The impact</p>
-        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{impact}</p>
-      </div>
+      {links.length > 0 && (
+        <div class="sm:col-span-3">
+          <dt class="eyebrow">Links</dt>
+          <dd class="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            {links.map((l) => (
+              <a href={l.href} class="link" target="_blank" rel="noopener noreferrer">{l.label} <span aria-hidden="true">↗</span></a>
+            ))}
+          </dd>
+        </div>
+      )}
+    </dl>
+
+    <!-- Metric strip -->
+    {metrics.length > 0 && (
+      <dl
+        class:list={[
+          'grid grid-cols-1 divide-y divide-line border-b border-line sm:divide-y-0 sm:divide-x',
+          metricCols[Math.min(metrics.length, 4)],
+        ]}
+      >
+        {metrics.map((m) => (
+          <div class="flex flex-col-reverse py-6 sm:px-6 sm:first:pl-0">
+            <dt class="mt-2 text-sm text-muted leading-snug text-pretty">{m.label}</dt>
+            <dd class="tabular text-3xl sm:text-4xl font-semibold tracking-tight text-fg">{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
+    <!-- Problem / Outcome -->
+    <div class="mt-14 grid gap-x-12 gap-y-10 md:grid-cols-2">
+      <section aria-labelledby="cs-problem">
+        <h2 id="cs-problem" class="eyebrow">Problem</h2>
+        <p class="mt-3 text-base text-muted leading-relaxed text-pretty">{problem}</p>
+      </section>
+      <section aria-labelledby="cs-outcome">
+        <h2 id="cs-outcome" class="eyebrow">Outcome</h2>
+        <p class="mt-3 text-base text-fg leading-relaxed text-pretty">{impact}</p>
+      </section>
     </div>
 
-    <hr class="border-slate-200 dark:border-gray-800 mb-10" />
+    <!-- Screenshots -->
+    {screenshots && screenshots.length > 0 && (
+      <section class="mt-14" aria-labelledby="cs-screens">
+        <h2 id="cs-screens" class="eyebrow">Screens</h2>
+        <ul class="mt-4 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4" role="list">
+          {screenshots.map((s) => (
+            <li class="shrink-0 snap-start">
+              <img
+                src={s.src}
+                alt={s.alt}
+                loading="lazy"
+                decoding="async"
+                class="block h-[min(520px,70vh)] w-auto aspect-[9/19.5] rounded-lg border border-line bg-canvas object-cover"
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
 
-    <!-- MDX content -->
-    <div class="prose-content">
-      <Content />
-    </div>
-
-    <!-- Prev / Next navigation -->
-    <nav class="mt-16 pt-8 border-t border-slate-200 dark:border-gray-800" aria-label="Case study navigation">
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Prev -->
-        <div>
-          {prev ? (
-            <a
-              href={`/projects/${prev.id}`}
-              class="group flex flex-col p-4 rounded-xl border border-slate-200 dark:border-gray-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-slate-50 dark:hover:bg-gray-900 transition-all"
-            >
-              <span class="flex items-center gap-1 font-mono text-xs text-slate-500 dark:text-slate-500 mb-1.5">
-                <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Previous
-              </span>
-              <span class="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                {prev.data.title}
-              </span>
-            </a>
-          ) : <div />}
-        </div>
-
-        <!-- Next -->
-        <div>
-          {next ? (
-            <a
-              href={`/projects/${next.id}`}
-              class="group flex flex-col items-end p-4 rounded-xl border border-slate-200 dark:border-gray-800 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-slate-50 dark:hover:bg-gray-900 transition-all text-right"
-            >
-              <span class="flex items-center gap-1 font-mono text-xs text-slate-500 dark:text-slate-500 mb-1.5">
-                Next
-                <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </span>
-              <span class="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                {next.data.title}
-              </span>
-            </a>
-          ) : <div />}
-        </div>
+    <!-- Body + table of contents -->
+    <div class="mt-16 border-t border-line pt-14 lg:grid lg:grid-cols-[minmax(0,43rem)_13rem] lg:justify-between lg:gap-16">
+      <div class="prose-content min-w-0">
+        <Content />
       </div>
 
-      <div class="mt-4 text-center">
-        <a
-          href="/projects"
-          class="text-sm text-slate-500 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-        >
-          Back to all projects
-        </a>
+      {toc.length > 2 && (
+        <aside class="hidden lg:block" aria-label="On this page">
+          <nav class="sticky top-24">
+            <p class="eyebrow">On this page</p>
+            <ol class="mt-4 space-y-2.5 border-l border-line">
+              {toc.map((h) => (
+                <li>
+                  <a
+                    href={`#${h.slug}`}
+                    class="-ml-px block border-l border-transparent pl-4 text-sm leading-snug text-muted hover:border-fg hover:text-fg transition-colors"
+                  >
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+      )}
+    </div>
+
+    <!-- Prev / Next -->
+    <nav class="mt-20 grid grid-cols-2 gap-6 border-t border-line pt-8" aria-label="More case studies">
+      <div>
+        {prev && (
+          <a href={`/projects/${prev.id}`} class="group block">
+            <span class="eyebrow">← Previous</span>
+            <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
+              {prev.data.title}
+            </span>
+          </a>
+        )}
+      </div>
+      <div class="text-right">
+        {next && (
+          <a href={`/projects/${next.id}`} class="group block">
+            <span class="eyebrow">Next →</span>
+            <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
+              {next.data.title}
+            </span>
+          </a>
+        )}
       </div>
     </nav>
   </article>

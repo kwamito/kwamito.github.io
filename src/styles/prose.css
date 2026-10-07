@@ -1,0 +1,258 @@
+/* ================================================================
+   Prose (MDX content)
+   Uses the tokens defined in global.css, so light/dark is automatic.
+   ================================================================ */
+.prose-content {
+  color: var(--muted);
+  line-height: 1.75;
+  font-size: 1.0625rem;
+}
+
+.prose-content > :first-child {
+  margin-top: 0;
+}
+
+.prose-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--fg);
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.prose-content h3 {
+  font-size: 1.1875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--fg);
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.015em;
+}
+
+.prose-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--fg);
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Clear the fixed 64px header when jumping to an anchor. */
+.prose-content :is(h2, h3, h4) {
+  scroll-margin-top: 6rem;
+}
+
+/* A heading directly after another heading needs less space. */
+.prose-content :is(h2, h3) + :is(h3, h4) {
+  margin-top: 1.25rem;
+}
+
+.prose-content p {
+  margin-bottom: 1.25rem;
+}
+
+.prose-content ul,
+.prose-content ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+}
+
+.prose-content li {
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+  list-style-type: disc;
+}
+
+.prose-content ol li {
+  list-style-type: decimal;
+}
+
+.prose-content li::marker {
+  color: var(--subtle);
+}
+
+/* Nested lists */
+.prose-content li > :is(ul, ol) {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.prose-content ul ul > li {
+  list-style-type: circle;
+}
+
+.prose-content li > p {
+  margin-bottom: 0.5rem;
+}
+
+.prose-content code {
+  font-size: 0.875em;
+  color: var(--fg);
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  padding: 0.125em 0.375em;
+  border-radius: 0.25rem;
+}
+
+/* ----------------------------------------------------------------
+   Code blocks (Shiki, dual theme with defaultColor: false)
+   Shiki writes --shiki-light / --shiki-dark on every token; we pick
+   one set per theme and let the token surface show through.
+   ---------------------------------------------------------------- */
+.prose-content pre {
+  position: relative;
+  background: var(--sunken) !important;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 1.125rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.75rem 0;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  tab-size: 2;
+}
+
+.prose-content pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: var(--fg);
+}
+
+.prose-content pre.astro-code,
+.prose-content pre.astro-code span {
+  color: var(--shiki-light);
+}
+
+.dark .prose-content pre.astro-code,
+.dark .prose-content pre.astro-code span {
+  color: var(--shiki-dark);
+}
+
+/* Language label, from Shiki's data-language attribute (no JS). */
+.prose-content pre[data-language]:not([data-language="plaintext"]):not([data-language="text"]) {
+  padding-top: 2.25rem;
+}
+
+.prose-content pre[data-language]:not([data-language="plaintext"]):not([data-language="text"])::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.625rem;
+  right: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------
+   Tables — hairline rows, mono header, scroll on narrow screens
+   ---------------------------------------------------------------- */
+.prose-content table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.75rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose-content thead th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.prose-content th,
+.prose-content td {
+  padding: 0.625rem 1.25rem 0.625rem 0;
+  vertical-align: top;
+}
+
+.prose-content th:last-child,
+.prose-content td:last-child {
+  padding-right: 0;
+}
+
+.prose-content tbody tr {
+  border-bottom: 1px solid var(--line);
+}
+
+.prose-content td {
+  color: var(--muted);
+}
+
+/* ----------------------------------------------------------------
+   Images and figures
+   ---------------------------------------------------------------- */
+.prose-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  margin: 2rem 0;
+}
+
+.prose-content figure {
+  margin: 2rem 0;
+}
+
+.prose-content figure img {
+  margin: 0;
+}
+
+.prose-content figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--subtle);
+}
+
+.prose-content a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.prose-content a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.prose-content strong {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.prose-content blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 1.25rem;
+  margin: 1.75rem 0;
+  color: var(--fg);
+}
+
+.prose-content hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2.5rem 0;
+}

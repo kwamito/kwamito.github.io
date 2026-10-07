@@ -12,13 +12,14 @@ interface Props {
 
 const {
   title,
-  description = 'Backend engineer based in Ghana. I build reliable, scalable production systems — payment platforms, APIs, and cloud infrastructure.',
+  description = 'Backend engineer based in Ghana. I build reliable production systems — workflow platforms, APIs, reporting and cloud infrastructure.',
   ogImage = '/og-image.png',
   noIndex = false,
 } = Astro.props;
 
-const siteUrl = 'https://nanakwame.dev'; // TODO: update when deploying
-const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? siteUrl);
+// Single source of truth for the domain is `site` in astro.config.mjs.
+const siteUrl = Astro.site ?? new URL('https://kwamito.github.io');
+const canonicalURL = new URL(Astro.url.pathname, siteUrl);
 const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engineer' : `${title} | Nana Kwame`;
 ---
 
@@ -28,11 +29,14 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0c0b" media="(prefers-color-scheme: dark)" />
 
     <!-- Theme: prevent flash of wrong theme -->
     <script is:inline>
       (function () {
-        const stored = localStorage.getItem('theme');
+        let stored = null;
+        try { stored = localStorage.getItem('theme'); } catch (e) {}
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (stored === 'dark' || (!stored && prefersDark)) {
           document.documentElement.classList.add('dark');
@@ -44,7 +48,7 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -63,7 +67,7 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(ogImage, Astro.site ?? siteUrl)} />
+    <meta property="og:image" content={new URL(ogImage, siteUrl)} />
     <meta property="og:site_name" content="Nana Kwame — Backend Engineer" />
     <meta property="og:locale" content="en_US" />
 
@@ -71,7 +75,7 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(ogImage, Astro.site ?? siteUrl)} />
+    <meta name="twitter:image" content={new URL(ogImage, siteUrl)} />
 
     <!-- Analytics: Plausible -->
     <!-- TODO: Sign up at https://plausible.io and add kwamito.github.io as a site.
@@ -84,11 +88,11 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     ></script>
   </head>
 
-  <body class="bg-slate-50 text-slate-900 dark:bg-gray-950 dark:text-slate-100 transition-colors duration-200">
+  <body class="bg-canvas text-fg font-sans">
     <!-- Skip to main content for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-medium"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-fg focus:text-canvas focus:rounded-lg focus:font-medium"
     >
       Skip to main content
     </a>

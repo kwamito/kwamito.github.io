@@ -1,120 +1,136 @@
 ---
 import Layout from '../../components/layout/Layout.astro';
 import SectionHeading from '../../components/ui/SectionHeading.astro';
-import BlogCard from '../../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
 
 const posts = await getCollection('writing', ({ data }) => !data.draft);
 const sorted = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// Collect all unique tags
 const allTags = [...new Set(sorted.flatMap((p) => p.data.tags ?? []))].sort();
 
-// Estimate reading time per post
 function readingTime(body: string) {
   const words = body.split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
+}
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+
+// Group posts by year, newest first.
+const years = new Map<number, typeof sorted>();
+for (const post of sorted) {
+  const y = post.data.date.getUTCFullYear();
+  years.set(y, [...(years.get(y) ?? []), post]);
 }
 ---
 
 <Layout
   title="Writing"
-  description="Technical writing by Nana Kwame Oparrey Kuhney — notes on Django, PostgreSQL, GCP, payment systems, and backend engineering from production experience."
+  description="Technical writing by Nana Kwame Oparrey Kuhney — notes on Django, PostgreSQL, GCP and backend engineering from production experience."
 >
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+  <div class="wrap-narrow py-16 sm:py-20">
     <SectionHeading
-      label="writing"
+      as="h1"
+      label="Writing"
       title="Notes from the backend."
-      subtitle="Practical lessons from building and running production systems. No fluff, no hot takes — just things I've actually learned."
+      subtitle="Practical lessons from building and running production systems: PostgreSQL, Django, Cloud Run and the workflows on top."
     />
 
-    <!-- Tag filter -->
     {allTags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-10" role="group" aria-label="Filter by tag">
-        <button
-          class="tag-filter active px-3 py-1 rounded-full text-xs font-mono font-medium border transition-colors
-                 border-blue-600 bg-blue-600 text-white
-                 hover:bg-blue-700"
-          data-tag="all"
-        >
-          all
-        </button>
+      <div class="-mt-4 mb-12 flex flex-wrap gap-x-4 gap-y-2" role="group" aria-label="Filter posts by tag">
+        <button type="button" class="tag-filter" data-tag="all" aria-pressed="true">All</button>
         {allTags.map((tag) => (
-          <button
-            class="tag-filter px-3 py-1 rounded-full text-xs font-mono font-medium border transition-colors
-                   border-slate-200 dark:border-gray-700 text-slate-600 dark:text-slate-400
-                   hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400"
-            data-tag={tag}
-          >
-            {tag}
-          </button>
+          <button type="button" class="tag-filter" data-tag={tag} aria-pressed="false">{tag}</button>
         ))}
       </div>
     )}
 
     {sorted.length === 0 ? (
-      <div class="text-center py-20 text-slate-500 dark:text-slate-500">
-        <p class="font-mono text-sm">No posts yet. Check back soon.</p>
-      </div>
+      <p class="font-mono text-sm text-subtle">No posts yet.</p>
     ) : (
-      <div id="posts-grid" class="grid sm:grid-cols-2 gap-5">
-        {sorted.map((post) => (
-          <div
-            class="post-card"
-            data-tags={JSON.stringify(post.data.tags ?? [])}
-          >
-            <BlogCard
-              title={post.data.title}
-              description={post.data.description}
-              date={post.data.date}
-              tags={post.data.tags}
-              slug={post.id}
-              readingTime={readingTime(post.body ?? '')}
-            />
-          </div>
+      <div class="space-y-12">
+        {[...years].map(([year, items]) => (
+          <section class="year-group" aria-labelledby={`year-${year}`}>
+            <h2 id={`year-${year}`} class="eyebrow tabular pb-3 border-b border-line-strong">{year}</h2>
+            <ol>
+              {items.map((post) => (
+                <li class="post-row border-b border-line" data-tags={JSON.stringify(post.data.tags ?? [])}>
+                  <a href={`/writing/${post.id}`} class="group grid gap-x-8 gap-y-1 py-6 sm:grid-cols-[4.5rem_minmax(0,1fr)]">
+                    <time datetime={post.data.date.toISOString()} class="font-mono text-sm text-subtle tabular sm:pt-0.5">
+                      {fmt(post.data.date)}
+                    </time>
+                    <div>
+                      <h3 class="text-lg font-medium leading-snug text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
+                        {post.data.title}
+                      </h3>
+                      <p class="mt-2 text-sm text-muted leading-relaxed text-pretty">{post.data.description}</p>
+                      <p class="mt-3 font-mono text-xs text-subtle">
+                        <span class="tabular">{readingTime(post.body ?? '')} min read</span>
+                        {post.data.tags.length > 0 && <span> · {post.data.tags.join(', ')}</span>}
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
         ))}
       </div>
 
-      <p id="no-results" class="hidden text-center py-12 text-sm text-slate-500 dark:text-slate-500 font-mono">
-        No posts match that tag.
-      </p>
+      <p id="no-results" class="hidden font-mono text-sm text-subtle">No posts match that tag.</p>
     )}
   </div>
 </Layout>
 
+<style>
+  .tag-filter {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5rem;
+    color: var(--subtle);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    cursor: pointer;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+
+  .tag-filter:hover {
+    color: var(--fg);
+  }
+
+  .tag-filter[aria-pressed='true'] {
+    color: var(--fg);
+    text-decoration-color: var(--accent);
+  }
+</style>
+
 <script>
   function initTagFilter() {
     const buttons = document.querySelectorAll<HTMLButtonElement>('.tag-filter');
-    const cards = document.querySelectorAll<HTMLElement>('.post-card');
+    const rows = document.querySelectorAll<HTMLElement>('.post-row');
+    const groups = document.querySelectorAll<HTMLElement>('.year-group');
     const noResults = document.getElementById('no-results');
-    let active = 'all';
 
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        active = btn.dataset.tag ?? 'all';
+        const active = btn.dataset.tag ?? 'all';
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
 
-        // Update button styles
-        buttons.forEach((b) => {
-          const isActive = b.dataset.tag === active;
-          b.classList.toggle('bg-blue-600', isActive);
-          b.classList.toggle('text-white', isActive);
-          b.classList.toggle('border-blue-600', isActive);
-          b.classList.toggle('border-slate-200', !isActive);
-          b.classList.toggle('dark:border-gray-700', !isActive);
-          b.classList.toggle('text-slate-600', !isActive);
-          b.classList.toggle('dark:text-slate-400', !isActive);
+        rows.forEach((row) => {
+          const tags: string[] = JSON.parse(row.dataset.tags ?? '[]');
+          row.hidden = active !== 'all' && !tags.includes(active);
         });
 
-        // Filter cards
-        let visible = 0;
-        cards.forEach((card) => {
-          const tags: string[] = JSON.parse(card.dataset.tags ?? '[]');
-          const show = active === 'all' || tags.includes(active);
-          card.style.display = show ? '' : 'none';
-          if (show) visible++;
+        let anyVisible = false;
+        groups.forEach((g) => {
+          const visible = g.querySelector('.post-row:not([hidden])') !== null;
+          g.hidden = !visible;
+          anyVisible ||= visible;
         });
 
-        noResults?.classList.toggle('hidden', visible > 0);
+        noResults?.classList.toggle('hidden', anyVisible);
       });
     });
   }

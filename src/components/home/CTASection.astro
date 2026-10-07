@@ -1,50 +1,54 @@
 ---
+import { site } from '../../config/site';
+
 interface Props {
   title?: string;
   subtitle?: string;
   primaryLabel?: string;
   primaryHref?: string;
+  /** Optional quiet text link next to the primary action. */
   secondaryLabel?: string;
   secondaryHref?: string;
 }
 
 const {
-  title = "Let's work together.",
-  subtitle = "I'm open to new opportunities, contracts, and interesting problems. If you're building something that matters, reach out.",
-  primaryLabel = 'Get In Touch',
+  title = 'Building something that has to stay correct?',
+  subtitle = 'I lead backend work on multi-role, workflow-heavy platforms in Django, PostgreSQL and Google Cloud. Tell me what you are building.',
+  primaryLabel = 'Get in touch',
   primaryHref = '/contact',
-  secondaryLabel = 'View Projects',
-  secondaryHref = '/projects',
+  secondaryLabel,
+  secondaryHref,
 } = Astro.props;
 ---
 
-<section class="relative py-24 overflow-hidden">
-  <!-- Background -->
-  <div class="absolute inset-0 bg-blue-600 dark:bg-blue-900/50" aria-hidden="true"></div>
-  <div class="absolute inset-0 bg-dot-grid opacity-20" aria-hidden="true"></div>
-  <div class="absolute right-0 top-0 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl" aria-hidden="true"></div>
-  <div class="absolute left-0 bottom-0 w-64 h-64 bg-blue-300/20 rounded-full blur-3xl" aria-hidden="true"></div>
+<section class="border-t border-line py-20 sm:py-28">
+  <div class="wrap">
+    <div class="card grid gap-10 p-6 sm:p-10 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-8">
+        {site.availability && (
+          <p class="eyebrow flex items-center gap-2">
+            <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+            {site.availability}
+          </p>
+        )}
+        <h2 class="mt-5 text-heading text-fg text-balance">{title}</h2>
+        <p class="mt-4 max-w-xl text-base leading-relaxed text-muted text-pretty">{subtitle}</p>
+      </div>
 
-  <div class="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
-    <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
-      {title}
-    </h2>
-    <p class="text-lg text-blue-100 dark:text-blue-200 mb-10 leading-relaxed">
-      {subtitle}
-    </p>
-    <div class="flex flex-wrap justify-center gap-4">
-      <a
-        href={primaryHref}
-        class="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors shadow-md"
-      >
-        {primaryLabel}
-      </a>
-      <a
-        href={secondaryHref}
-        class="inline-flex items-center gap-2 px-6 py-3 border border-blue-300/40 dark:border-blue-500/40 text-white font-medium rounded-lg hover:bg-white/10 transition-colors"
-      >
-        {secondaryLabel}
-      </a>
+      <div class="flex flex-col items-start gap-4 lg:col-span-4 lg:items-end">
+        <a
+          href={primaryHref}
+          class="inline-flex items-center rounded-lg bg-fg px-5 py-3 text-sm font-medium text-canvas transition-opacity hover:opacity-85"
+        >
+          {primaryLabel}
+        </a>
+        {site.email && (
+          <a href={`mailto:${site.email}`} class="link font-mono text-sm">{site.email}</a>
+        )}
+        {secondaryLabel && secondaryHref && (
+          <a href={secondaryHref} class="link text-sm">{secondaryLabel}</a>
+        )}
+      </div>
     </div>
   </div>
 </section>

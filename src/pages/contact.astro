@@ -1,249 +1,139 @@
 ---
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
+import { site, displayUrl } from '../config/site';
 
-// TODO: Replace all placeholder links with your actual details
-const contacts = [
-  {
-    label: 'Email',
-    value: 'hello@nanakwame.dev', // TODO: update email
-    href: 'mailto:hello@nanakwame.dev',
-    description: 'Best for detailed questions and project enquiries.',
-    icon: `<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>`,
-  },
-  {
-    label: 'LinkedIn',
-    value: 'linkedin.com/in/nanakwame', // TODO: update LinkedIn slug
-    href: 'https://linkedin.com/in/', // TODO: add your actual LinkedIn URL
-    description: 'Professional background and work history.',
-    icon: `<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>`,
-  },
-  {
-    label: 'GitHub',
-    value: 'github.com/kwamito',
-    href: 'https://github.com/kwamito',
-    description: 'Code, side projects, and open source work.',
-    icon: `<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>`,
-  },
-  {
-    label: 'CV / Resume',
-    value: 'Download PDF',
-    href: '/cv.pdf', // TODO: Add cv.pdf to /public/cv.pdf
-    description: 'Full work history and technical background.',
-    icon: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>`,
-    download: true,
-  },
+type Method = { label: string; value: string; href: string; external?: boolean; download?: boolean };
+
+// Built from site config — anything null is simply not listed.
+const methods = [
+  site.email && { label: 'Email', value: site.email, href: `mailto:${site.email}` },
+  site.linkedin && { label: 'LinkedIn', value: displayUrl(site.linkedin), href: site.linkedin, external: true },
+  site.github && { label: 'GitHub', value: displayUrl(site.github), href: site.github, external: true },
+  site.cv && { label: 'CV', value: 'Download PDF', href: site.cv, download: true },
+].filter(Boolean) as Method[];
+
+const lookingFor = [
+  'Backend problems at real scale',
+  'Teams that care about reliability and correctness',
+  'Remote, or on-site in Accra',
 ];
 
-// TODO: Go to https://formspree.io, sign up, create a form, and paste your form ID below.
-// Your form endpoint will be: https://formspree.io/f/YOUR_FORM_ID
-const FORMSPREE_ID = 'YOUR_FORM_ID';
+const labelClass = 'block font-mono text-xs text-subtle mb-1.5';
+const inputClass =
+  'w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-fg placeholder:text-subtle transition-colors hover:border-line-strong focus:border-line-strong';
 ---
 
 <Layout
   title="Contact"
-  description="Get in touch with Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. Open to opportunities, contracts, and interesting problems."
+  description="Get in touch with Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. Open to senior backend roles and contracts."
 >
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-    <SectionHeading
-      label="contact"
-      title="Let's talk."
-      subtitle="I'm open to new opportunities, contracts, and conversations about interesting problems."
-    />
+  <div class="wrap-narrow">
+    <header class="pt-16 md:pt-24 animate-fade-up">
+      <SectionHeading as="h1" label="Contact" title="Let's talk." />
+      {site.availability && (
+        <p class="-mt-6 mb-12 flex items-center gap-2.5 text-muted">
+          <span class="h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+          <span>
+            {site.availability}{site.location && <span class="text-subtle"> · {site.location}</span>}
+          </span>
+        </p>
+      )}
+    </header>
 
-    <!-- Contact cards -->
-    <div class="grid sm:grid-cols-2 gap-4 mb-10">
-      {contacts.map((contact) => (
-        <a
-          href={contact.href}
-          target={contact.download ? undefined : '_blank'}
-          rel={contact.download ? undefined : 'noopener noreferrer'}
-          download={contact.download}
-          class="group flex gap-4 p-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md hover:shadow-blue-500/5 transition-all duration-200"
-        >
-          <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <Fragment set:html={contact.icon} />
-            </svg>
+    {methods.length > 0 && (
+      <section class="border-t border-line py-16 animate-fade-up anim-delay-100">
+        <h2 class="eyebrow mb-4">Reach me</h2>
+        <dl class="border-t border-line">
+          {methods.map((m) => (
+            <div class="grid gap-x-6 gap-y-1 border-b border-line py-3 sm:grid-cols-[8rem_1fr]">
+              <dt class="font-mono text-xs text-subtle sm:pt-0.5">{m.label}</dt>
+              <dd class="text-sm">
+                <a
+                  href={m.href}
+                  class="link"
+                  target={m.external ? '_blank' : undefined}
+                  rel={m.external ? 'noopener noreferrer' : undefined}
+                  download={m.download ? true : undefined}
+                >
+                  {m.value}
+                </a>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+
+    {site.formspreeId ? (
+      <section class="border-t border-line py-16">
+          <h2 class="text-heading text-fg mb-2">Send a message</h2>
+          <p class="mb-8 text-muted">I reply within a couple of days.</p>
+
+          <div id="form-success" class="hidden mb-6 rounded-lg bg-accent-soft px-4 py-3 text-sm text-fg" role="status" aria-live="polite">
+            <span class="font-medium">Message sent.</span> I'll be in touch shortly.
           </div>
-          <div class="min-w-0">
-            <p class="font-mono text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-0.5">
-              {contact.label}
-            </p>
-            <p class="font-medium text-slate-900 dark:text-slate-100 text-sm mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-              {contact.value}
-            </p>
-            <p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed">
-              {contact.description}
-            </p>
-          </div>
-        </a>
-      ))}
-    </div>
-
-    <!-- Availability status -->
-    <div class="p-5 bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl mb-12">
-      <div class="flex items-start gap-3">
-        <span class="relative flex h-3 w-3 mt-1 flex-shrink-0">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-        </span>
-        <div>
-          <p class="font-medium text-slate-900 dark:text-slate-100 text-sm mb-1">
-            Currently open to opportunities
-          </p>
-          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            Backend engineering roles, technical contracts, and consulting on production system architecture. Based in Ghana — open to remote work globally.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Contact form -->
-    <div class="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl p-6 md:p-8">
-      <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Send a message</h2>
-      <p class="text-sm text-slate-500 dark:text-slate-500 mb-6">
-        I'll get back to you within a couple of days.
-      </p>
-
-      <!-- Success state (hidden by default) -->
-      <div
-        id="form-success"
-        class="hidden flex items-start gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 mb-6"
-        role="status"
-        aria-live="polite"
-      >
-        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-        <div>
-          <p class="font-medium text-emerald-800 dark:text-emerald-300 text-sm">Message sent.</p>
-          <p class="text-sm text-emerald-700 dark:text-emerald-400 mt-0.5">Thanks for reaching out — I'll be in touch shortly.</p>
-        </div>
-      </div>
-
-      <!-- Error state (hidden by default) -->
-      <div
-        id="form-error"
-        class="hidden flex items-start gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 mb-6"
-        role="alert"
-        aria-live="polite"
-      >
-        <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <div>
-          <p class="font-medium text-red-800 dark:text-red-300 text-sm">Something went wrong.</p>
-          <p class="text-sm text-red-700 dark:text-red-400 mt-0.5">Please try again or email me directly.</p>
-        </div>
-      </div>
-
-      <form
-        id="contact-form"
-        action={`https://formspree.io/f/${FORMSPREE_ID}`}
-        method="POST"
-        novalidate
-      >
-        <div class="grid sm:grid-cols-2 gap-4 mb-4">
-          <!-- Name -->
-          <div>
-            <label for="name" class="block font-mono text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">
-              Name <span class="text-red-500" aria-hidden="true">*</span>
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              autocomplete="name"
-              placeholder="Your name"
-              class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-            />
+          <div id="form-error" class="hidden mb-6 rounded-lg border border-line-strong bg-sunken px-4 py-3 text-sm text-fg" role="alert">
+            <span class="font-medium">Something went wrong.</span>
+            {site.email ? <> Try again, or email <a href={`mailto:${site.email}`} class="link">{site.email}</a>.</> : ' Please try again.'}
           </div>
 
-          <!-- Email -->
-          <div>
-            <label for="email" class="block font-mono text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">
-              Email <span class="text-red-500" aria-hidden="true">*</span>
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              autocomplete="email"
-              placeholder="you@example.com"
-              class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-            />
-          </div>
-        </div>
+          <form id="contact-form" action={`https://formspree.io/f/${site.formspreeId}`} method="POST" class="space-y-5">
+            <div class="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label for="name" class={labelClass}>Name</label>
+                <input id="name" name="name" type="text" required autocomplete="name" class={inputClass} />
+              </div>
+              <div>
+                <label for="email" class={labelClass}>Email</label>
+                <input id="email" name="email" type="email" required autocomplete="email" class={inputClass} />
+              </div>
+            </div>
+            <div>
+              <label for="subject" class={labelClass}>Subject <span class="text-subtle">(optional)</span></label>
+              <input id="subject" name="subject" type="text" class={inputClass} />
+            </div>
+            <div>
+              <label for="message" class={labelClass}>Message</label>
+              <textarea
+                id="message"
+                name="message"
+                required
+                minlength="10"
+                rows="6"
+                placeholder="What are you building, and where do you need help?"
+                class={`${inputClass} resize-y`}
+              ></textarea>
+            </div>
+            {/* Honeypot: Formspree drops submissions that fill this in. */}
+            <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+            <button
+              id="submit-btn"
+              type="submit"
+              class="inline-flex items-center gap-2 rounded-lg bg-fg text-canvas px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Send message
+            </button>
+          </form>
+      </section>
+    ) : (
+      methods.length > 0 && (
+        <p class="-mt-10 pb-16 text-muted">
+          Reach me directly through any of the above — I reply within a couple of days.
+        </p>
+      )
+    )}
 
-        <!-- Subject -->
-        <div class="mb-4">
-          <label for="subject" class="block font-mono text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">
-            Subject
-          </label>
-          <input
-            id="subject"
-            name="subject"
-            type="text"
-            placeholder="What's this about?"
-            class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
-          />
-        </div>
-
-        <!-- Message -->
-        <div class="mb-6">
-          <label for="message" class="block font-mono text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5">
-            Message <span class="text-red-500" aria-hidden="true">*</span>
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            required
-            rows="5"
-            placeholder="What are you building? What do you need help with?"
-            class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors resize-y"
-          ></textarea>
-        </div>
-
-        <!-- Submit -->
-        <button
-          id="submit-btn"
-          type="submit"
-          class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-lg transition-all duration-150 shadow-sm shadow-blue-600/20"
-        >
-          <span id="submit-label">Send message</span>
-          <svg id="submit-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-          <svg id="submit-spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-          </svg>
-        </button>
-      </form>
-    </div>
-
-    <!-- What I'm looking for -->
-    <div class="mt-10">
-      <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4">What I'm looking for</h2>
+    <section class="border-t border-line py-16">
+      <h2 class="eyebrow mb-4">What I'm looking for</h2>
       <ul class="space-y-2" role="list">
-        {[
-          'Interesting backend problems at real scale',
-          'Teams that care about reliability and correctness',
-          'Environments where I can grow and take ownership',
-          'Remote-friendly or based in Accra, Ghana',
-        ].map((item) => (
-          <li class="flex gap-2.5 text-sm text-slate-700 dark:text-slate-300">
-            <svg class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
+        {lookingFor.map((item) => (
+          <li class="relative pl-6 text-fg before:absolute before:left-0 before:top-[0.8em] before:h-px before:w-3 before:bg-line-strong">
             {item}
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   </div>
 </Layout>
 
@@ -251,26 +141,22 @@ const FORMSPREE_ID = 'YOUR_FORM_ID';
   function initContactForm() {
     const form = document.getElementById('contact-form') as HTMLFormElement | null;
     const btn = document.getElementById('submit-btn') as HTMLButtonElement | null;
-    const label = document.getElementById('submit-label');
-    const icon = document.getElementById('submit-icon');
-    const spinner = document.getElementById('submit-spinner');
     const success = document.getElementById('form-success');
     const error = document.getElementById('form-error');
 
-    if (!form) return;
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = 'true';
 
+    // Native constraint validation runs before this fires, so only valid forms get here.
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      // Hide previous states
       success?.classList.add('hidden');
       error?.classList.add('hidden');
 
-      // Loading state
-      if (btn) btn.disabled = true;
-      label && (label.textContent = 'Sending…');
-      icon?.classList.add('hidden');
-      spinner?.classList.remove('hidden');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+      }
 
       try {
         const res = await fetch(form.action, {
@@ -278,7 +164,6 @@ const FORMSPREE_ID = 'YOUR_FORM_ID';
           body: new FormData(form),
           headers: { Accept: 'application/json' },
         });
-
         if (res.ok) {
           success?.classList.remove('hidden');
           form.reset();
@@ -288,10 +173,10 @@ const FORMSPREE_ID = 'YOUR_FORM_ID';
       } catch {
         error?.classList.remove('hidden');
       } finally {
-        if (btn) btn.disabled = false;
-        label && (label.textContent = 'Send message');
-        icon?.classList.remove('hidden');
-        spinner?.classList.add('hidden');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Send message';
+        }
       }
     });
   }

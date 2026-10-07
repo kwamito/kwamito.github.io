@@ -1,4 +1,6 @@
 ---
+// Renders roles as CV entries. The dot/line timeline was dropped:
+// with a single role it added decoration without structure.
 interface Role {
   title: string;
   company: string;
@@ -17,64 +19,32 @@ interface Props {
 const { roles } = Astro.props;
 ---
 
-<div class="relative">
-  <!-- Vertical line -->
-  <div class="absolute left-4 top-0 bottom-0 w-px bg-slate-200 dark:bg-gray-800 lg:left-8" aria-hidden="true"></div>
-
-  <div class="flex flex-col gap-10">
-    {roles.map((role, index) => (
-      <div class="relative flex gap-8 lg:gap-12">
-        <!-- Timeline dot -->
-        <div class="relative flex-shrink-0 flex flex-col items-center" aria-hidden="true">
-          <div class={`relative z-10 w-8 h-8 lg:w-10 lg:h-10 flex-shrink-0 flex items-center justify-center rounded-full border-2 ${role.current ? 'bg-blue-600 border-blue-600 shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-700'}`}>
-            {role.current ? (
-              <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
-            ) : (
-              <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-gray-600"></span>
-            )}
-          </div>
+<div>
+  {roles.map((role) => (
+    <article class="border-t border-line py-16">
+      <header class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <div>
+          <h2 class="text-xl font-semibold tracking-tight text-fg">{role.title}</h2>
+          <p class="mt-1 text-muted">{role.company}</p>
         </div>
-
-        <!-- Content -->
-        <div class="flex-1 pb-2">
-          <!-- Header -->
-          <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-1 mb-4">
-            <div>
-              <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-                {role.title}
-              </h3>
-              <p class="text-blue-600 dark:text-blue-400 font-medium text-sm mt-0.5">
-                {role.company}
-              </p>
-            </div>
-            <div class="text-right">
-              <p class="font-mono text-sm text-slate-500 dark:text-slate-400">{role.period}</p>
-              <p class="font-mono text-xs text-slate-400 dark:text-slate-600 mt-0.5">{role.location} · {role.type}</p>
-            </div>
-          </div>
-
-          <!-- Highlights -->
-          <ul class="space-y-2 mb-4" role="list">
-            {role.highlights.map((highlight) => (
-              <li class="flex gap-2.5 text-sm text-slate-700 dark:text-slate-300">
-                <svg class="w-4 h-4 text-blue-500 dark:text-blue-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                <span>{highlight}</span>
-              </li>
-            ))}
-          </ul>
-
-          <!-- Tags -->
-          <div class="flex flex-wrap gap-1.5">
-            {role.tags.map((tag) => (
-              <span class="px-2 py-0.5 rounded text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-gray-800">
-                {tag}
-              </span>
-            ))}
-          </div>
+        <div class="sm:text-right">
+          <p class="font-mono text-sm tabular text-fg">{role.period}</p>
+          <p class="mt-1 font-mono text-xs text-subtle">{role.location} · {role.type}</p>
         </div>
+      </header>
+
+      <ul class="mt-8 space-y-3" role="list">
+        {role.highlights.map((highlight) => (
+          <li class="relative pl-6 leading-relaxed text-muted before:absolute before:left-0 before:top-[0.8em] before:h-px before:w-3 before:bg-line-strong">
+            {highlight}
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-8 grid gap-x-6 gap-y-1 sm:grid-cols-[5rem_1fr]">
+        <p class="eyebrow sm:pt-0.5">Stack</p>
+        <p class="font-mono text-sm leading-relaxed text-muted">{role.tags.join(' · ')}</p>
       </div>
-    ))}
-  </div>
+    </article>
+  ))}
 </div>

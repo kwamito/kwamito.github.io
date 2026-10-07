@@ -1,6 +1,6 @@
 ---
-title: "Lessons from Building Payment Systems"
-description: "What building a production payment processing system taught me about reliability, failure modes, and the discipline required when money is involved."
+title: "Lessons from Working on Payment Flows"
+description: "What working on payment flows teaches you about reliability, failure modes, and the discipline required when money is involved."
 date: 2024-01-20
 tags: ["Payments", "Backend", "Architecture", "Django", "Production"]
 draft: false
@@ -8,7 +8,7 @@ draft: false
 
 Payment systems are unforgiving teachers. The failure modes are real, the consequences are visible, and the margin for "good enough" is much smaller than in most software.
 
-Here are the lessons that changed how I think about backend systems generally — not just payments.
+Here are the lessons from working on payment flows that changed how I think about backend systems generally — not just payments.
 
 ## Money is eventually consistent, but the user experience can't be
 
@@ -58,14 +58,12 @@ Store what you need for reconciliation, reporting, and customer support. Store n
 
 The end-of-day reconciliation process — comparing your system's records against the gateway's records — is not an operational nicety. It's a data integrity check. If your records and the gateway's records don't agree, something went wrong, and you need to know what.
 
-I build reconciliation into the payment system design from the start: a structured reconciliation report generated nightly, with explicit handling for:
+Build reconciliation into the design from the start: a structured reconciliation report generated nightly, with explicit handling for:
 - Records in your system with no match in the gateway
 - Records in the gateway with no match in your system
 - Records that match on ID but differ on amount or status
 
 Each category has a defined review process, not just an alert.
-
-{/* TODO: Add specific examples from your experience that you're comfortable sharing */}
 
 ## The happy path is the minority
 

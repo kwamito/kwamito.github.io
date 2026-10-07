@@ -1,0 +1,99 @@
+---
+title: "Stash — Offline Budgeting for Ghana"
+description: "A personal budgeting app for Android built for Ghanaian users: GHS-first, investments modelled on local instruments, and quick capture from pasted MoMo and bank alerts. No backend, no account, no network calls."
+problem: "Generic budgeting apps assume card feeds, foreign currencies and Western investment products. Day-to-day money in Ghana moves through MTN MoMo and bank SMS alerts, and savings go into T-bills, money-market funds and GSE shares — none of which those apps model well. I also wanted my financial data to stay on my phone."
+impact: "A full-featured, offline-only budgeting app — accounts, budgets, debts, investments, goals and recurring rules — with domain rules for money handled in one tested core of 263 Jest tests, and persistence that writes only what changed."
+tags: ["React Native", "Expo", "TypeScript", "SQLite", "Android", "Jest"]
+order: 4
+featured: false
+role: "Sole developer — personal project"
+period: "2026"
+metrics:
+  - { value: "263", label: "Jest tests of pure domain logic" }
+  - { value: "0", label: "Network calls — offline-only by design" }
+  - { value: "v2", label: "Versioned backup format that still restores v1" }
+stack: ["Expo SDK 53", "React Native 0.79", "React 19", "expo-router", "TypeScript", "expo-sqlite", "Jest"]
+screenshots:
+  - src: "/projects/stash-budget-app/1-home.jpg"
+    alt: "Stash home screen: a suggestion to invest part of new income, total balance across bank, MoMo and cash accounts, and a warning that spending is running ahead of the monthly budget"
+  - src: "/projects/stash-budget-app/2-home-more.jpg"
+    alt: "Stash home screen continued: invested total with a 91-day T-bill nearing maturity, monthly income and expenses, a two-week logging streak, and money owed to the user"
+  - src: "/projects/stash-budget-app/3-budgets.jpg"
+    alt: "Stash budgets screen: amount spent against the monthly budget with category budgets for dining out, shopping and groceries"
+  - src: "/projects/stash-budget-app/4-reports-month.jpg"
+    alt: "Stash monthly report: a donut chart of spending broken down by category with percentages of the total"
+  - src: "/projects/stash-budget-app/5-reports-year.jpg"
+    alt: "Stash yearly report: income, expenses and amount kept for the year, with a month-by-month income and expense bar chart"
+---
+
+
+## Overview
+
+Stash is a personal budgeting app for Android, built for how money actually moves in Ghana. The primary currency is GHS, investments are modelled on Ghanaian instruments — treasury bills, a money-market fund, GSE shares — and quick capture is tuned for MTN MoMo and bank SMS alerts: paste an alert and it's parsed into a transaction. The app never reads SMS itself.
+
+There is no backend, no account and no network access. Everything lives in on-device SQLite, and cloud backup is handled by Android Auto Backup. It's a personal project in active development, distributed as a sideloaded APK.
+
+## The Challenge
+
+A budgeting app is mostly bookkeeping rules, and the rules are where bugs hide:
+
+- **Transfers aren't spending.** Moving money between your own accounts must not inflate income or expenses.
+- **Investments aren't income.** When a T-bill matures, only the gain is income — the principal was already yours.
+- **Recurring dates are awkward.** A rule for the 31st has to do something sensible in February, and return to the 31st afterwards.
+- **No server to fall back on.** With offline-only storage, a corrupted write or a bad restore has no remote copy to recover from.
+
+## Architecture
+
+### One store, one source of truth
+
+State lives in a single reducer store, and the money rules live in pure domain functions with no React or storage dependencies, which keeps them easy to test.
+
+### SQLite tables of JSON rows
+
+Each record type — accounts, transactions, budgets, debts, investments, goals, recurring rules — is a SQLite table of JSON rows declared in one registry. Adding a record type means adding a registry entry, not writing a new persistence layer. Data saved in an earlier AsyncStorage format is migrated into SQLite.
+
+### Writing only what changed
+
+After each state change, the persistence layer diffs the new state against the last saved baseline and writes only the changed rows. All writes go through a single serialised write chain, and a failed write never becomes the baseline for the next diff — so a transient failure is retried on the next save instead of being silently forgotten.
+
+### Features
+
+- Accounts and transfers; transactions with category splits, tags and receipt photos
+- Budgets with rollover and copy-forward
+- Debts and receivables, investments, savings goals
+- Recurring rules, posted automatically or sent to a confirm queue
+- Insights, a year view and category trends
+- A home-screen quick-add widget, app shortcuts and local reminders
+- Biometric/PIN app lock
+- JSON backup/restore and CSV export
+- Onboarding that sets currency, categories and a first budget
+
+## Technical Highlights
+
+### Money rules in one place
+
+The core rules are explicit and tested:
+
+- Transfers are excluded from income and expense totals.
+- Account balance = opening balance + income − expenses ± transfers.
+- Investment payouts book only the gain as income.
+- T-bill interest uses a 364-day year.
+- Auto-invest tags each contribution with the income it came from, so the same income is never invested twice.
+
+### Recurring rules that survive short months
+
+Recurring rules anchor on their start date rather than the previous occurrence, so a rule set for the 31st lands at the end of February and returns to the 31st afterwards. Missed occurrences are backfilled when the app opens, with a cap so a long gap can't flood the ledger.
+
+### Versioned backups with validators
+
+Backups are a versioned JSON format. Validators check a backup's shape on restore, and the current v2 format still restores v1 files.
+
+### Tests where the risk is
+
+263 Jest tests cover the pure domain logic — the layer where a silent mistake would cost a user real money.
+
+## What I Learned
+
+Offline-only is a feature, not a limitation, but it moves responsibility onto the client: write safety, migration and backup integrity all become the app's job. Diffed, serialised writes and versioned backups were what made that manageable.
+
+The other lesson was that local context matters. Modelling MoMo alerts, T-bills on a 364-day year and GSE shares made the app useful in a way a generic budgeting tool isn't.
