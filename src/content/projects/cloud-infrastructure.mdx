@@ -1,6 +1,6 @@
 ---
 title: "Cloud Infrastructure & Deployment Pipeline"
-description: "Migrated production services from a traditional VPS setup to a fully managed Google Cloud Platform infrastructure — Cloud Run, Cloud SQL, Secret Manager, and automated CI/CD with GitHub Actions."
+description: "Migrated production services from a traditional VPS setup to managed Google Cloud infrastructure: Cloud Run, Cloud SQL, Secret Manager, and automated CI/CD with GitHub Actions."
 problem: "Production services were running on manually managed VPS instances with no repeatable deployment process, no secrets management, and no ability to scale under load. Deployments were stressful, manual, and error-prone."
 impact: "All services run on GCP with automated deployments, managed database, proper secrets handling, and the ability to scale horizontally. Deployments went from a 30-minute manual process to a 5-minute automated pipeline triggered by a Git push."
 tags: ["GCP", "Cloud Run", "Cloud SQL", "Docker", "GitHub Actions", "Secret Manager", "Cloud Storage"]
@@ -17,7 +17,7 @@ stack: ["Cloud Run", "Cloud SQL", "Secret Manager", "Cloud Storage", "Artifact R
 
 ## Overview
 
-This project covers the infrastructure work that made the production backend systems reliable, scalable, and deployable without manual intervention. It's the kind of work that doesn't show up in user-facing features but that every other aspect of the system depends on.
+This project covers the infrastructure work that made the production backend systems reliable, scalable, and deployable without manual intervention. Users never see this work directly, but the rest of the system depends on it.
 
 The migration moved all services from manually managed Linux VPS instances to Google Cloud Platform, with a fully automated deployment pipeline, managed database infrastructure, proper secrets handling, and container-based deployments.
 
@@ -26,12 +26,12 @@ The migration moved all services from manually managed Linux VPS instances to Go
 The previous infrastructure state was common for small engineering teams moving fast:
 
 - Production running on VPS instances configured manually, with no documentation of the exact setup
-- Deployment meant SSH-ing into the server, pulling code, running migrations, and restarting the service — no automated steps, no rollback plan
+- Deployment meant SSH-ing into the server, pulling code, running migrations, and restarting the service, with no automated steps and no rollback plan
 - Database backups happened manually, on a schedule that required remembering
 - API keys and database credentials were stored in `.env` files on the server
 - A bad deployment that needed rollback meant SSH-ing back in and reverting manually
 
-This setup worked — until it didn't. A failed deployment during business hours with no automated rollback and a manual recovery process is the kind of event that makes teams nervous about deploying at all.
+With this setup, a failed deployment during business hours meant a manual recovery with no automated rollback. That makes a team nervous about deploying at all.
 
 ## What I Built
 
@@ -42,7 +42,7 @@ Each service is packaged as a Docker container and deployed on Google Cloud Run.
 - It scales to zero between requests (no idle costs)
 - It scales horizontally automatically under load
 - Traffic routing between revisions allows gradual rollouts
-- Each revision is immutable — "rollback" means routing traffic to a previous revision
+- Each revision is immutable, so a rollback means routing traffic to a previous revision
 
 ### Cloud SQL for managed PostgreSQL
 
@@ -50,7 +50,7 @@ The PostgreSQL database was migrated to Cloud SQL (PostgreSQL edition). Cloud SQ
 
 ### GCP Secret Manager for all secrets
 
-Every secret — database credentials, third-party API keys, Django `SECRET_KEY` — is stored in Secret Manager. Application containers pull secrets at startup. No secrets in environment variable files. No secrets in source code. Secret access is controlled by IAM service accounts with the minimum required permissions.
+Every secret (database credentials, third-party API keys, Django `SECRET_KEY`) is stored in Secret Manager. Application containers pull secrets at startup. No secrets in environment variable files. No secrets in source code. Secret access is controlled by IAM service accounts with the minimum required permissions.
 
 ### GitHub Actions CI/CD pipeline
 
@@ -68,7 +68,7 @@ If any step fails, the pipeline stops. The previous Cloud Run revision continues
 
 ### Cloud Storage for media and document files
 
-All user-uploaded files and generated documents are stored in Cloud Storage buckets with appropriate lifecycle policies. Application code never stores files on the container filesystem — containers are ephemeral and stateless.
+All user-uploaded files and generated documents are stored in Cloud Storage buckets with appropriate lifecycle policies. Application code never stores files on the container filesystem, because containers are ephemeral and stateless.
 
 ## Technical Highlights
 
@@ -78,7 +78,7 @@ Django Docker images can get large and slow to build. I used multi-stage builds 
 
 ### Database migration safety
 
-Cloud SQL combined with the CI/CD pipeline introduced a discipline around migrations: migrations run as a separate step before the new container revision handles traffic. The old container revision continues running during migration. This means migrations must be backwards-compatible — additive, not destructive.
+The previous Cloud Run revision keeps serving traffic until the new one is promoted, so old and new code can run against the same schema at the same time. That means migrations must be backwards-compatible: additive, not destructive.
 
 ### IAM least-privilege
 
@@ -86,12 +86,12 @@ Each Cloud Run service has its own service account with only the permissions it 
 
 ### Health checks
 
-Each Django service exposes a `/healthz/` endpoint that checks database connectivity and returns a structured JSON response. Cloud Run uses this for startup and liveness probing — a container that can't reach the database won't receive traffic.
+Each Django service exposes a `/healthz/` endpoint that checks database connectivity and returns a structured JSON response. Cloud Run uses this for startup and liveness probing, so a container that can't reach the database won't receive traffic.
 
 ## What I Learned
 
-Infrastructure work is mostly about removing yourself from the critical path. The goal isn't to do deployments faster — it's to make deployments so reliable and automated that they're not events you worry about.
+Infrastructure work is mostly about removing yourself from the critical path. Faster deploys were a side effect. The aim was deploys reliable enough that nobody had to worry about them.
 
-The most valuable thing this migration produced wasn't faster deployments — it was the confidence that came from knowing exactly what was running, exactly how it was configured, and exactly what would happen when a deployment was triggered.
+The most useful result of the migration was knowing what was running, how it was configured, and what would happen when a deployment was triggered.
 
 {/* TODO: Add cost comparison or specific metrics if comfortable */}

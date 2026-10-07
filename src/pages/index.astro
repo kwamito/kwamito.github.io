@@ -73,6 +73,7 @@ const moreLink = 'link text-sm font-medium';
               impact={leadProject.data.impact}
               tags={leadProject.data.tags}
               slug={leadProject.id}
+              metrics={leadProject.data.metrics}
             />
           </div>
         )}
@@ -89,7 +90,7 @@ const moreLink = 'link text-sm font-medium';
         ))}
       </div>
 
-      <p class="mt-10"><a href="/projects" class={moreLink}>All case studies</a></p>
+      <p class="mt-10"><a href="/projects/" class={moreLink}>All case studies</a></p>
     </div>
   </section>
 
@@ -107,7 +108,7 @@ const moreLink = 'link text-sm font-medium';
             <SkillCard title={s.title} description={s.description} skills={s.skills} />
           ))}
         </div>
-        <p class="mt-10"><a href="/skills" class={moreLink}>Full skills breakdown</a></p>
+        <p class="mt-10"><a href="/skills/" class={moreLink}>Full skills breakdown</a></p>
       </div>
     </div>
   </section>
@@ -135,7 +136,7 @@ const moreLink = 'link text-sm font-medium';
               />
             ))}
           </div>
-          <p class="mt-10"><a href="/writing" class={moreLink}>All writing</a></p>
+          <p class="mt-10"><a href="/writing/" class={moreLink}>All writing</a></p>
         </div>
       </div>
     </section>

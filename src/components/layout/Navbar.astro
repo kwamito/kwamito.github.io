@@ -2,17 +2,17 @@
 import ThemeToggle from '../ui/ThemeToggle.astro';
 
 const navLinks = [
-  { href: '/about', label: 'About' },
-  { href: '/experience', label: 'Experience' },
-  { href: '/projects', label: 'Work' },
-  { href: '/writing', label: 'Writing' },
-  { href: '/skills', label: 'Skills' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/about/', label: 'About' },
+  { href: '/experience/', label: 'Experience' },
+  { href: '/projects/', label: 'Work' },
+  { href: '/writing/', label: 'Writing' },
+  { href: '/skills/', label: 'Skills' },
+  { href: '/contact/', label: 'Contact' },
 ];
 
 const pathname = Astro.url.pathname;
 function isActive(href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return pathname.startsWith(href);
 }
 ---
 

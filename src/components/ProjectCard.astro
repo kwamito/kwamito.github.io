@@ -12,10 +12,12 @@ interface Props {
   index?: number;
   /** 'lead' renders a wide two-column layout for the first case study. */
   size?: 'default' | 'lead';
+  /** Shown on the lead card only; the first three are used. */
+  metrics?: { value: string; label: string }[];
 }
 
-const { title, description, problem, impact, tags, slug, index, size = 'default' } = Astro.props;
-const href = `/projects/${slug}`;
+const { title, description, problem, impact, tags, slug, index, size = 'default', metrics = [] } = Astro.props;
+const href = `/projects/${slug}/`;
 const isLead = size === 'lead';
 const num = index !== undefined ? String(index).padStart(2, '0') : null;
 const tagLine = tags.slice(0, isLead ? 6 : 4).join(' · ');
@@ -46,6 +48,17 @@ const tagLine = tags.slice(0, isLead ? 6 : 4).join(' · ');
     <p class:list={['mt-3 text-muted leading-relaxed text-pretty', isLead ? 'text-base' : 'text-sm']}>
       {description}
     </p>
+
+    {isLead && metrics.length > 0 && (
+      <dl class="mt-8 grid grid-cols-3 gap-4 border-t border-line pt-6">
+        {metrics.slice(0, 3).map((m) => (
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs leading-snug text-subtle text-pretty">{m.label}</dt>
+            <dd class="order-first text-2xl font-semibold tracking-tight text-fg tabular">{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
 
     {!isLead && (
       <p class="mt-4 text-sm leading-relaxed text-fg line-clamp-3">

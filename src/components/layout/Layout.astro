@@ -1,26 +1,55 @@
 ---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import geistLatinWoff2 from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import '../../styles/global.css';
 import Navbar from './Navbar.astro';
 import Footer from './Footer.astro';
+import { site } from '../../config/site';
 
 interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  ogImageAlt?: string;
   noIndex?: boolean;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  /** Page-specific structured data, emitted alongside the site-wide Person. */
+  jsonLd?: object;
 }
 
 const {
   title,
   description = 'Backend engineer based in Ghana. I build reliable production systems — workflow platforms, APIs, reporting and cloud infrastructure.',
   ogImage = '/og-image.png',
+  ogImageAlt = `${site.name} — Lead Backend Engineer, Accra, Ghana`,
   noIndex = false,
+  type = 'website',
+  publishedTime,
+  jsonLd,
 } = Astro.props;
 
 // Single source of truth for the domain is `site` in astro.config.mjs.
 const siteUrl = Astro.site ?? new URL('https://kwamito.github.io');
 const canonicalURL = new URL(Astro.url.pathname, siteUrl);
+const ogImageURL = new URL(ogImage, siteUrl);
 const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engineer' : `${title} | Nana Kwame`;
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': new URL('/#person', siteUrl).href,
+  name: site.name,
+  jobTitle: 'Lead Backend Engineer',
+  url: siteUrl.href,
+  address: { '@type': 'PostalAddress', addressLocality: 'Accra', addressCountry: 'GH' },
+  sameAs: [site.github, site.linkedin].filter(Boolean),
+};
+const structuredData = jsonLd ? [person, jsonLd] : [person];
+// Escape '<' so content can never close the script element early.
+const structuredDataJson = JSON.stringify(structuredData).replace(/</g, '\\u003c');
+
 ---
 
 <!doctype html>
@@ -44,17 +73,15 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
       })();
     </script>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts: self-hosted via @fontsource-variable; preload the latin body face -->
+    <link rel="preload" href={geistLatinWoff2} as="font" type="font/woff2" crossorigin />
 
-    <!-- Favicon -->
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Writing — Nana Kwame" href={new URL('/rss.xml', siteUrl)} />
 
     <!-- SEO -->
     <title>{fullTitle}</title>
@@ -63,19 +90,30 @@ const fullTitle = title === 'Home' ? 'Nana Kwame Oparrey Kuhney — Backend Engi
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Open Graph -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(ogImage, siteUrl)} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:site_name" content="Nana Kwame — Backend Engineer" />
     <meta property="og:locale" content="en_US" />
+    {type === 'article' && publishedTime && (
+      <meta property="article:published_time" content={publishedTime.toISOString()} />
+    )}
+    {type === 'article' && <meta property="article:author" content={site.name} />}
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(ogImage, siteUrl)} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+
+    <!-- Structured data -->
+    <script type="application/ld+json" is:inline set:html={structuredDataJson} />
 
     <!-- Analytics: Plausible -->
     <!-- TODO: Sign up at https://plausible.io and add kwamito.github.io as a site.

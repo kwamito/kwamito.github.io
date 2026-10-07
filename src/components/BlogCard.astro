@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { title, description, date, slug, readingTime } = Astro.props;
-const href = `/writing/${slug}`;
+const href = `/writing/${slug}/`;
 
 const formattedDate = date.toLocaleDateString('en-GB', {
   year: 'numeric',

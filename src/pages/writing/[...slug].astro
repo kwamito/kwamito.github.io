@@ -1,6 +1,7 @@
 ---
 import Layout from '../../components/layout/Layout.astro';
 import { getCollection, render } from 'astro:content';
+import { site } from '../../config/site';
 
 export async function getStaticPaths() {
   const posts = await getCollection('writing', ({ data }) => !data.draft);
@@ -23,6 +24,20 @@ const { title, description, date, tags = [] } = post.data;
 const wordCount = (post.body ?? '').split(/\s+/).filter(Boolean).length;
 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
+const postUrl = new URL(Astro.url.pathname, Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: date.toISOString(),
+  url: postUrl,
+  mainEntityOfPage: postUrl,
+  image: new URL('/og-image.png', Astro.site).href,
+  keywords: tags.length > 0 ? tags.join(', ') : undefined,
+  author: { '@type': 'Person', name: site.name, url: new URL('/', Astro.site).href },
+};
+
 const formattedDate = date.toLocaleDateString('en-GB', {
   day: 'numeric',
   month: 'long',
@@ -31,9 +46,9 @@ const formattedDate = date.toLocaleDateString('en-GB', {
 });
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} type="article" publishedTime={date} jsonLd={jsonLd}>
   <article class="wrap-narrow py-16 sm:py-20">
-    <a href="/writing" class="inline-flex items-center gap-2 text-sm text-muted hover:text-fg transition-colors">
+    <a href="/writing/" class="inline-flex items-center gap-2 text-sm text-muted hover:text-fg transition-colors">
       <span aria-hidden="true" class="font-mono">←</span>
       All writing
     </a>
@@ -60,7 +75,7 @@ const formattedDate = date.toLocaleDateString('en-GB', {
     <nav class="mt-20 grid grid-cols-2 gap-6 border-t border-line pt-8" aria-label="More writing">
       <div>
         {older && (
-          <a href={`/writing/${older.id}`} class="group block">
+          <a href={`/writing/${older.id}/`} class="group block">
             <span class="eyebrow">← Older</span>
             <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
               {older.data.title}
@@ -70,7 +85,7 @@ const formattedDate = date.toLocaleDateString('en-GB', {
       </div>
       <div class="text-right">
         {newer && (
-          <a href={`/writing/${newer.id}`} class="group block">
+          <a href={`/writing/${newer.id}/`} class="group block">
             <span class="eyebrow">Newer →</span>
             <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
               {newer.data.title}

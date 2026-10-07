@@ -55,8 +55,8 @@
 }
 
 @theme {
-  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Type scale additions. Use text-display for the home hero,
      text-title for page h1s, text-heading for section h2s. */
@@ -150,10 +150,6 @@
   samp {
     font-family: var(--font-mono);
   }
-
-  .tabular {
-    font-variant-numeric: tabular-nums;
-  }
 }
 
 /* ================================================================
@@ -170,11 +166,6 @@
   }
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
 @keyframes slide-down {
   from {
     opacity: 0;
@@ -186,23 +177,24 @@
   }
 }
 
-.animate-fade-up {
+/* Utilities (not plain classes) so they sit in Tailwind's utilities layer
+   and can be combined with variants and overridden by other utilities. */
+@utility animate-fade-up {
   animation: fade-up 0.5s var(--ease-out-expo) both;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.4s ease both;
-}
-
-.animate-slide-down {
+@utility animate-slide-down {
   animation: slide-down 0.18s ease both;
 }
 
 /* Named anim-delay-* to avoid clashing with Tailwind's delay-* (transition-delay). */
-.anim-delay-100 { animation-delay: 80ms; }
-.anim-delay-200 { animation-delay: 160ms; }
-.anim-delay-300 { animation-delay: 240ms; }
-.anim-delay-400 { animation-delay: 320ms; }
+@utility anim-delay-100 {
+  animation-delay: 80ms;
+}
+
+@utility anim-delay-200 {
+  animation-delay: 160ms;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -220,24 +212,68 @@
 }
 
 /* ================================================================
-   Components
+   Components — defined with @utility so state/colour utilities on the
+   same element (hover:border-line-strong, text-muted …) win.
    ================================================================ */
-.card {
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
 }
 
 /* Text link with an underline that strengthens on hover. */
-.link {
+@utility link {
   color: var(--fg);
   text-decoration: underline;
   text-decoration-color: var(--line-strong);
   text-underline-offset: 4px;
   text-decoration-thickness: 1px;
   transition: text-decoration-color 0.15s ease;
+
+  &:hover {
+    text-decoration-color: var(--accent);
+  }
 }
 
-.link:hover {
-  text-decoration-color: var(--accent);
+/* Buttons. One primary, one secondary, used everywhere. */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+@utility btn-primary {
+  background: var(--fg);
+  color: var(--canvas);
+
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+@utility btn-secondary {
+  border: 1px solid var(--line);
+  color: var(--fg);
+
+  &:hover {
+    border-color: var(--line-strong);
+  }
+}
+
+/* Vertical rhythm for page sections. */
+@utility section-y {
+  padding-block: 4rem;
+  @media (width >= 40rem) {
+    padding-block: 5.5rem;
+  }
 }

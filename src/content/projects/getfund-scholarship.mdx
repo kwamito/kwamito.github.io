@@ -1,16 +1,16 @@
 ---
 title: "GETFund Scholarship Platform"
 description: "The backend for the GETFund scholarship programme in Ghana — the full award lifecycle from multi-step application to programme completion, built on Django, PostgreSQL and Google Cloud."
-problem: "A scholarship programme runs for years per scholar and involves applicants and around fifteen distinct staff roles: reviewers, finance, audit, travel, administrators, committees and the bank. Every decision has to be traceable, every approval has to happen in the right order, and the same records are edited concurrently by people with very different permissions."
-impact: "One backend now carries a scholar from application through vetting, review, interviews and award, then through visas and travel, yearly reconfirmation, tuition and stipend tranches, completion and return — with multi-stage approval workflows, full change history on 56 models, and around 1,085 automated tests guarding it."
+problem: "A scholarship programme runs for years per scholar and involves applicants and 12 distinct staff roles. Every decision has to be traceable, every approval has to happen in the right order, and the same records are edited concurrently by people with very different permissions."
+impact: "One backend now carries a scholar from application through vetting, review, interviews and award, then through visas and travel, yearly reconfirmation, tuition and stipend tranches, completion and return — with multi-stage approval workflows, full change history on 56 models, and 1,085 automated tests guarding it."
 tags: ["Python", "Django", "Django REST Framework", "PostgreSQL", "GCP", "Terraform", "Redis"]
 order: 1
 featured: true
-role: "Lead backend engineer"
+role: "Lead Backend Engineer"
 period: "2024 — present"
 metrics:
-  - { value: "~1,085", label: "Automated tests across 57 files" }
-  - { value: "15", label: "Staff roles with composed, per-endpoint permissions" }
+  - { value: "1,085", label: "Automated tests across 57 files" }
+  - { value: "12", label: "Staff roles with composed, per-endpoint permissions" }
   - { value: "4", label: "Multi-stage approval workflows modelled as state machines" }
   - { value: "98%", label: "Of backend commits, May 2024 to present" }
 stack: ["Django 5", "Django REST Framework", "PostgreSQL (Cloud SQL)", "Redis", "Cloud Tasks", "App Engine", "Cloud Storage", "Terraform", "GitHub Actions", "Sentry"]
@@ -26,9 +26,9 @@ It is a Django 5 and Django REST Framework codebase of 22 apps and around 88 reg
 
 ## The Challenge
 
-The difficulty isn't any single feature — it's that a scholar's record is touched by many people over many years, and each of them is allowed to do something slightly different.
+The difficulty is that a scholar's record is touched by many people over many years, and each of them is allowed to do something slightly different.
 
-- **Many roles, one record.** Applicants plus roughly fifteen staff roles — reviewers, lead reviewers, the scholarship team lead, grant manager, finance, travel coordinator, auditor, administrator, education committee, judges, the bank and IT — all act on the same scholars at different stages.
+- **Many roles, one record.** Applicants plus 12 staff roles (reviewer, lead reviewer, scholarship team lead, grant manager, finance, travel coordinator, auditor, administrator, education committee, judge, bank manager and IT) all act on the same scholars at different stages.
 - **Ordered approvals.** Reconfirmation, completion and tuition payments each pass through several sign-offs in a fixed order. Skipping a step, or two people advancing the same record at once, must be impossible.
 - **Accountability.** Any change to a scholar's status, documents or funding has to be explainable after the fact: who did it, when, and what it was before.
 - **Bursty load.** When intake reopens, a large number of applicants arrive at once and create applications in the same few minutes.
@@ -40,7 +40,7 @@ The difficulty isn't any single feature — it's that a scholar's record is touc
 Each long-running process is an explicit state machine rather than a set of loosely related flags:
 
 - **Application:** pending → processing → approved or rejected, with a separate blocked state.
-- **Reconfirmation:** team-lead review → finance allocation → audit → admin approval → approved or rejected.
+- **Yearly reconfirmation** (each year of study, after travel): team-lead review → finance allocation → audit → admin approval → approved or rejected.
 - **Completion:** draft → submitted → team-lead review (with revision loop) → audit review → admin review → approved or declined.
 - **Tuition payments:** pending → pending approval → approved or rejected → confirmed, plus an on-hold state. Each tranche's status is derived from its audit, approval, bank confirmation and hold flags rather than stored independently, so it can't drift out of sync with them.
 
@@ -86,7 +86,7 @@ Management commands import schools, courses and other reference data, so new int
 
 ### Tests and migrations
 
-Around 1,085 tests across 57 files (pytest + factory_boy) cover permissions, workflow transitions and edge cases. The schema has evolved through 422 migrations.
+1,085 tests across 57 files (pytest + factory_boy) cover permissions, workflow transitions and edge cases. The schema has evolved through 422 migrations.
 
 ## What I Learned
 

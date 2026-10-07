@@ -1,14 +1,15 @@
 import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = ({ site }) => {
-  const siteUrl = site?.toString() ?? 'https://nanakwame.dev';
+  if (!site) throw new Error('robots.txt: set `site` in astro.config.mjs');
+  const sitemapUrl = new URL('sitemap-index.xml', site);
 
   return new Response(
     [
       'User-agent: *',
       'Allow: /',
       '',
-      `Sitemap: ${siteUrl}sitemap-index.xml`,
+      `Sitemap: ${sitemapUrl}`,
     ].join('\n'),
     {
       headers: {

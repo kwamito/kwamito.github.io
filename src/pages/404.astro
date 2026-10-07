@@ -1,0 +1,17 @@
+---
+import Layout from '../components/layout/Layout.astro';
+---
+
+<Layout title="Not found" description="This page doesn't exist." noIndex>
+  <section class="wrap-narrow pt-16 md:pt-24 pb-24">
+    <p class="eyebrow">404</p>
+    <h1 class="mt-4 text-title text-fg text-balance">This page doesn't exist.</h1>
+    <p class="mt-5 text-lg text-muted leading-relaxed text-pretty">
+      The link may be out of date, or the page may have moved.
+    </p>
+    <p class="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-base">
+      <a href="/" class="link">Back to home</a>
+      <a href="/projects/" class="link">See the case studies</a>
+    </p>
+  </section>
+</Layout>

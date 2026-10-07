@@ -55,7 +55,7 @@ for (const post of sorted) {
             <ol>
               {items.map((post) => (
                 <li class="post-row border-b border-line" data-tags={JSON.stringify(post.data.tags ?? [])}>
-                  <a href={`/writing/${post.id}`} class="group grid gap-x-8 gap-y-1 py-6 sm:grid-cols-[4.5rem_minmax(0,1fr)]">
+                  <a href={`/writing/${post.id}/`} class="group grid gap-x-8 gap-y-1 py-6 sm:grid-cols-[4.5rem_minmax(0,1fr)]">
                     <time datetime={post.data.date.toISOString()} class="font-mono text-sm text-subtle tabular sm:pt-0.5">
                       {fmt(post.data.date)}
                     </time>

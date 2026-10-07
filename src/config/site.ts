@@ -3,7 +3,7 @@
 export const site = {
   name: 'Nana Kwame Oparrey Kuhney',
   shortName: 'Nana Kwame',
-  role: 'Backend Engineer',
+  role: 'Lead Backend Engineer',
   location: 'Accra, Ghana',
   timeZone: 'Africa/Accra',
   availability: 'Open to senior backend roles and contracts',

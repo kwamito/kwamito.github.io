@@ -5,33 +5,33 @@ import SectionHeading from '../components/ui/SectionHeading.astro';
 const areas = [
   {
     title: 'Core backend',
-    use: 'REST API design, business logic, async tasks, webhooks and background jobs across 5+ production systems.',
-    tools: ['Python', 'Django', 'Django REST Framework', 'Celery', 'Redis', 'pytest', 'OpenAPI'],
+    use: 'REST API design, workflow and business logic, background jobs and scheduled tasks, with large automated test suites.',
+    tools: ['Python', 'Django', 'Django REST Framework', 'Celery', 'Cloud Tasks', 'pytest', 'OpenAPI'],
   },
   {
     title: 'Databases & storage',
-    use: 'Data modelling, indexing, materialized views and query optimisation for 500K+ record workloads.',
-    tools: ['PostgreSQL', 'Cloud SQL', 'Google Cloud Storage'],
+    use: 'Data modelling, change history, indexing, materialized views and query optimisation, plus caching.',
+    tools: ['PostgreSQL', 'Cloud SQL', 'Redis', 'Google Cloud Storage'],
   },
   {
     title: 'Cloud & infrastructure',
-    use: 'GCP-native production deployments on managed services and containers.',
-    tools: ['GCP', 'Cloud Run', 'Cloud SQL', 'Pub/Sub', 'Docker', 'Nginx', 'Linux'],
+    use: 'Production on Google Cloud managed services and containers, with infrastructure defined in Terraform.',
+    tools: ['GCP', 'App Engine', 'Cloud Run', 'Cloud SQL', 'Terraform', 'Docker', 'Linux'],
   },
   {
     title: 'CI/CD & automation',
-    use: 'Zero-downtime deploys, automated test pipelines and environment promotion across all production services.',
+    use: 'Pipelines that run the test suite on every change and deploy automatically, with rollback to the previous release.',
     tools: ['GitHub Actions', 'Docker', 'Git'],
   },
   {
     title: 'Observability',
-    use: 'Error tracking, structured logging, slow-query analysis, health checks and alerting across production platforms.',
+    use: 'Error tracking, structured logging, slow-query analysis and health checks.',
     tools: ['GlitchTip / Sentry', 'Structured logging'],
   },
   {
     title: 'Security',
-    use: 'Token auth, secret rotation, signed URLs, rate limiting and CORS policy for multi-role platforms with sensitive records.',
-    tools: ['OAuth 2.0', 'GCP Secret Manager', 'Signed URLs'],
+    use: 'Token auth with OTP, role-based permissions, secret management, signed URLs, rate limiting and encryption of sensitive fields.',
+    tools: ['JWT', 'GCP Secret Manager', 'Signed URLs'],
   },
   {
     title: 'Mobile (personal projects)',
@@ -43,7 +43,7 @@ const areas = [
 
 <Layout
   title="Skills"
-  description="Technical skills of Nana Kwame Oparrey Kuhney — Python, Django, PostgreSQL, GCP, Cloud Run, CI/CD, observability, and backend security."
+  description="Technical skills of Nana Kwame Oparrey Kuhney: Python, Django, PostgreSQL, Google Cloud, Terraform, CI/CD, observability and backend security."
 >
   <div class="wrap">
     <header class="pt-16 md:pt-24 animate-fade-up">
@@ -63,7 +63,7 @@ const areas = [
       </div>
       <div class="border-t border-line">
         {areas.map((area) => (
-          <div class="grid gap-x-10 gap-y-2 border-b border-line py-6 md:grid-cols-[13rem_1fr_18rem]">
+          <div class="grid gap-x-10 gap-y-2 border-b border-line py-6 last:border-b-0 md:grid-cols-[13rem_1fr_18rem]">
             <h2 class="font-semibold text-fg">{area.title}</h2>
             <p class="leading-relaxed text-muted">{area.use}</p>
             <p class="font-mono text-sm leading-relaxed text-subtle md:pt-0.5">{area.tools.join(' · ')}</p>
@@ -74,7 +74,7 @@ const areas = [
 
     <section class="border-t border-line py-12">
       <p class="text-muted">
-        Need these applied to your system? <a href="/contact" class="link">Get in touch</a>
+        Need these applied to your system? <a href="/contact/" class="link">Get in touch</a>
       </p>
     </section>
   </div>

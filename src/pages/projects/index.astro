@@ -6,22 +6,26 @@ import { getCollection } from 'astro:content';
 
 const projects = await getCollection('projects');
 const sorted = projects.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+const isPersonal = (p: (typeof projects)[number]) =>
+  (p.data.role ?? '').toLowerCase().includes('personal project');
+const work = sorted.filter((p) => !isPersonal(p));
+const side = sorted.filter(isPersonal);
 ---
 
 <Layout
   title="Projects"
-  description="Case studies of production backend systems built by Nana Kwame Oparrey Kuhney — a scholarship lifecycle platform, reporting, cloud infrastructure and local-first mobile apps."
+  description="Case studies by Nana Kwame Oparrey Kuhney: a scholarship lifecycle platform, reporting, cloud infrastructure, and two local-first Android side projects."
 >
   <div class="wrap py-16 sm:py-20">
     <SectionHeading
       as="h1"
       label="Projects"
-      title="Production systems, written up as case studies."
-      subtitle="A scholarship platform, reporting, infrastructure and two local-first mobile apps. For each: the problem, how the system is built, and what changed."
+      title="Systems I have built, written up as case studies."
+      subtitle="Work systems (a scholarship platform, reporting and cloud infrastructure) and two local-first side projects. For each: the problem, how it is built, and what changed."
     />
 
     <div class="grid gap-6 md:grid-cols-2">
-      {sorted.map((project, index) => (
+      {work.map((project, index) => (
         <div class:list={['grid', index === 0 && 'md:col-span-2']}>
           <ProjectCard
             title={project.data.title}
@@ -33,10 +37,36 @@ const sorted = projects.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 9
             featured={project.data.featured}
             index={index + 1}
             size={index === 0 ? 'lead' : 'default'}
+            metrics={project.data.metrics}
           />
         </div>
       ))}
     </div>
+
+    {side.length > 0 && (
+      <section class="mt-20 border-t border-line pt-12" aria-labelledby="side-projects">
+        <p class="eyebrow">Personal</p>
+        <h2 id="side-projects" class="mt-3 text-heading text-fg">Side projects</h2>
+        <p class="mt-2 mb-8 text-muted">Correctness without a server: local-first Android apps.</p>
+        <div class="grid gap-6 md:grid-cols-2">
+          {side.map((project, index) => (
+            <div class="grid">
+              <ProjectCard
+                title={project.data.title}
+                description={project.data.description}
+                problem={project.data.problem}
+                impact={project.data.impact}
+                tags={project.data.tags}
+                slug={project.id}
+                featured={project.data.featured}
+                index={work.length + index + 1}
+                size="default"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
 
     <p class="mt-12 font-mono text-xs text-subtle">
       Client names and sensitive operational details are withheld.

@@ -15,11 +15,11 @@ const roles = [
     current: true,
     highlights: [
       'Lead engineer on the backend for the GETFund scholarship programme in Ghana, covering the full award lifecycle: applications, review, interviews and scoring, visa and travel, yearly reconfirmation, tuition and stipend tranches to universities, completion and return. Wrote about 98% of its 1,054 commits since May 2024.',
-      'Built multi-stage approval workflows (team lead → finance → audit → admin) for applicants and around 15 staff roles, with role-based permissions and row-level locking on concurrent state transitions.',
-      'Kept full change history on 56 models so every decision can be audited, backed by about 1,085 automated tests.',
+      'Built the multi-stage approval workflows, including yearly reconfirmation (team lead → finance → audit → admin) and programme completion, for applicants and 12 staff roles, with role-based permissions and row-level locking on concurrent state transitions.',
+      'Kept full change history on 56 models so every decision can be audited, backed by 1,085 automated tests.',
       'Built a companion PDF letter service in Node and Puppeteer that generates 16 letter types.',
       'Built a reporting and analytics engine on PostgreSQL materialized views and a read replica, cutting reporting queries from 2–5 minutes to under 500 ms.',
-      'Led migration of core services to Google Cloud (Cloud Run, Cloud SQL, Secret Manager) with GitHub Actions pipelines that took deploys from 30 minutes by hand to 5 minutes automated.',
+      'Ran production on Google Cloud (App Engine, Cloud Run, Cloud SQL, Secret Manager) with infrastructure in Terraform and GitHub Actions pipelines that cut deploys from 30 minutes by hand to 5 automated.',
       'Implemented error tracking (GlitchTip), structured logging and production performance monitoring across all services.',
       'Set API security practice across our platforms: token-based authentication, signed URLs for asset access, secret rotation via GCP Secret Manager, and rate limiting.',
       'Defined backend engineering standards, documentation practices and onboarding for the engineering team.',
@@ -31,6 +31,7 @@ const roles = [
       'DRF',
       'PostgreSQL',
       'GCP',
+      'App Engine',
       'Cloud Run',
       'Cloud SQL',
       'Docker',
@@ -70,10 +71,7 @@ const roles = [
       <h2 class="text-heading text-fg mb-6">Background</h2>
       <div class="space-y-5 text-[1.0625rem] leading-[1.75] text-muted">
         <p>
-          My foundation is self-directed study and production work. I've learned more from tracing a production bug through the logs at midnight than from any formal curriculum.
-        </p>
-        <p>
-          I study database internals, follow releases of the frameworks I use, read post-mortems from companies running at scale, and build things to test ideas.
+          My foundation is self-directed study and production work. I study database internals, follow releases of the frameworks I use, read other teams' post-mortems, and build things to test ideas.
         </p>
       </div>
     </section>
@@ -90,7 +88,7 @@ const roles = [
           </a>
         )}
         <p class="text-muted">
-          Hiring for a senior backend role? <a href="/contact" class="link">Get in touch</a>
+          Hiring for a senior backend role? <a href="/contact/" class="link">Get in touch</a>
         </p>
       </div>
     </section>
