@@ -1,0 +1,39 @@
+---
+interface Item {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  /** Accessible name for the nav, e.g. "More case studies". */
+  label: string;
+  prev: Item | null;
+  next: Item | null;
+  /** Eyebrow text, e.g. "← Previous" / "Next →". */
+  prevLabel: string;
+  nextLabel: string;
+}
+
+const { label, prev, next, prevLabel, nextLabel } = Astro.props;
+const titleClass =
+  'mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors';
+---
+
+<nav class="mt-20 grid grid-cols-2 gap-6 border-t border-line pt-8" aria-label={label}>
+  <div>
+    {prev && (
+      <a href={prev.href} class="group block">
+        <span class="eyebrow">{prevLabel}</span>
+        <span class={titleClass}>{prev.title}</span>
+      </a>
+    )}
+  </div>
+  <div class="text-right">
+    {next && (
+      <a href={next.href} class="group block">
+        <span class="eyebrow">{nextLabel}</span>
+        <span class={titleClass}>{next.title}</span>
+      </a>
+    )}
+  </div>
+</nav>

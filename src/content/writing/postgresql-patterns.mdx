@@ -80,7 +80,7 @@ For aggregate reports that are expensive to compute in real time, materialized v
 CREATE MATERIALIZED VIEW daily_transaction_summary AS
 SELECT
     date_trunc('day', created_at) AS day,
-    payment_method,
+    channel,
     COUNT(*) AS transaction_count,
     SUM(amount) AS total_amount
 FROM transactions
@@ -88,7 +88,7 @@ WHERE status = 'confirmed'
 GROUP BY 1, 2;
 
 -- Unique index required for CONCURRENTLY refresh
-CREATE UNIQUE INDEX ON daily_transaction_summary(day, payment_method);
+CREATE UNIQUE INDEX ON daily_transaction_summary(day, channel);
 ```
 
 Refresh without blocking reads:
@@ -134,7 +134,7 @@ with transaction.atomic():
     tx.save()
 ```
 
-This is the right tool for payment state transitions, inventory updates, and anywhere you need "check then write" to be atomic.
+This is the right tool for approval steps, status transitions, and anywhere a check-then-write has to be atomic.
 
 ---
 

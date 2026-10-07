@@ -1,7 +1,15 @@
 ---
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
+import ClosingLine from '../components/ui/ClosingLine.astro';
 import { site } from '../config/site';
+import { compact } from '../lib/compact';
+
+interface Fact {
+  label: string;
+  value: string;
+  mono?: boolean;
+}
 
 const values = [
   {
@@ -17,29 +25,29 @@ const values = [
     body: 'The right tool is usually the boring tool. I reach for complexity only when simplicity has run out of room.',
   },
   {
-    title: 'Documentation as a first-class concern',
+    title: 'Documentation is part of the work',
     body: 'A well-documented API and a clear README are a form of respect for the people who come after you — including future you.',
   },
 ];
 
-const facts = [
+const facts = compact<Fact>([
   site.location && { label: 'Location', value: site.location },
   { label: 'Role', value: 'Lead Backend Engineer, Effect Studios' },
   { label: 'Primary stack', value: 'Python · Django · PostgreSQL · GCP', mono: true },
   { label: 'Interests', value: 'Distributed systems, API design, performance' },
   site.availability && { label: 'Open to', value: site.availability },
   { label: 'Languages', value: 'English, Twi' }, // TODO: update
-].filter(Boolean) as { label: string; value: string; mono?: boolean }[];
+]);
 
 // Body copy for the reading sections. Not using .prose-content here:
 // its paragraph margins doubled up with space-y and left uneven gaps.
-const body = 'space-y-5 text-[1.0625rem] leading-[1.75] text-muted';
+const body = 'space-y-5 text-body-lg text-muted';
 const h2 = 'text-heading text-fg mb-6';
 ---
 
 <Layout
   title="About"
-  description="Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. How I got here, how I work, and what I believe about building software."
+  description="Nana Kwame Oparrey Kuhney, Lead Backend Engineer based in Ghana. How I got here, how I work, and what I believe about building software."
 >
   <div class="wrap-narrow">
     <header class="pt-16 md:pt-24 animate-fade-up">
@@ -47,7 +55,8 @@ const h2 = 'text-heading text-fg mb-6';
         as="h1"
         label="About"
         title="Building software in Ghana, for the world."
-        subtitle="I'm Nana Kwame Oparrey Kuhney — a backend engineer based in Accra. I design and build the parts of software systems that people don't see but depend on every day."
+        subtitle="I'm Nana Kwame Oparrey Kuhney, a lead backend engineer based in Accra. I design and build the parts of software systems that people don't see but depend on every day."
+        class="mb-12"
       />
     </header>
 
@@ -55,10 +64,10 @@ const h2 = 'text-heading text-fg mb-6';
       <h2 class={h2}>Who I am</h2>
       <div class={body}>
         <p>
-          My work lives at the intersection of APIs, data systems and cloud infrastructure. I've built multi-stage approval workflows where every decision is on the record, reporting engines that answer in milliseconds instead of minutes, and the cloud pipelines that ship them.
+          I work on APIs, data systems and cloud infrastructure. That has meant approval workflows that keep a full change history, reporting queries brought down from minutes to under half a second, and the deploy pipelines that ship them.
         </p>
         <p>
-          I'm Lead Backend Engineer at <strong class="font-medium text-fg">Effect Studios Limited</strong>, where I own the backend architecture and production operations for several platforms — including the backend for the GETFund scholarship programme, which runs the whole award lifecycle from application through completion and return for applicants and around 15 staff roles.
+          I'm Lead Backend Engineer at <strong class="font-medium text-fg">Effect Studios Limited</strong>, where I own the backend architecture and production operations for several platforms — including the backend for the GETFund scholarship programme, which runs the whole award lifecycle from application through completion and return for applicants and 12 staff roles.
         </p>
         <p>
           Outside work I build local-first Android apps for the same conditions: Stash, an offline-first budgeting app built for Ghana, and a habit tracker built around idempotent writes. Building for West African infrastructure and its network conditions has sharpened my instincts for systems that hold up in the real world.
@@ -116,10 +125,6 @@ const h2 = 'text-heading text-fg mb-6';
       </dl>
     </section>
 
-    <section class="border-t border-line py-12">
-      <p class="text-muted">
-        Want to talk about a role or a system? <a href="/contact" class="link">Get in touch</a>
-      </p>
-    </section>
+    <ClosingLine lead="Want to talk about a role or a system?" />
   </div>
 </Layout>

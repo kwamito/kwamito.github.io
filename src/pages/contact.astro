@@ -1,20 +1,22 @@
 ---
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
+import StatusDot from '../components/ui/StatusDot.astro';
 import { site, displayUrl } from '../config/site';
+import { compact } from '../lib/compact';
 
 type Method = { label: string; value: string; href: string; external?: boolean; download?: boolean };
 
 // Built from site config — anything null is simply not listed.
-const methods = [
+const methods = compact<Method>([
   site.email && { label: 'Email', value: site.email, href: `mailto:${site.email}` },
   site.linkedin && { label: 'LinkedIn', value: displayUrl(site.linkedin), href: site.linkedin, external: true },
   site.github && { label: 'GitHub', value: displayUrl(site.github), href: site.github, external: true },
   site.cv && { label: 'CV', value: 'Download PDF', href: site.cv, download: true },
-].filter(Boolean) as Method[];
+]);
 
 const lookingFor = [
-  'Backend problems at real scale',
+  'Workflow-heavy systems where correctness and auditability matter',
   'Teams that care about reliability and correctness',
   'Remote, or on-site in Accra',
 ];
@@ -26,14 +28,14 @@ const inputClass =
 
 <Layout
   title="Contact"
-  description="Get in touch with Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. Open to senior backend roles and contracts."
+  description="Get in touch with Nana Kwame Oparrey Kuhney, Lead Backend Engineer based in Ghana. Open to senior backend roles and contracts."
 >
   <div class="wrap-narrow">
     <header class="pt-16 md:pt-24 animate-fade-up">
-      <SectionHeading as="h1" label="Contact" title="Let's talk." />
+      <SectionHeading as="h1" label="Contact" title="Let's talk." class={site.availability ? 'mb-6' : 'mb-12'} />
       {site.availability && (
-        <p class="-mt-6 mb-12 flex items-center gap-2.5 text-muted">
-          <span class="h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+        <p class="mb-12 flex items-center gap-2.5 text-muted">
+          <StatusDot />
           <span>
             {site.availability}{site.location && <span class="text-subtle"> · {site.location}</span>}
           </span>
@@ -62,10 +64,15 @@ const inputClass =
             </div>
           ))}
         </dl>
+        {!site.formspreeId && (
+          <p class="mt-6 text-muted">
+            Reach me directly through any of the above — I reply within a couple of days.
+          </p>
+        )}
       </section>
     )}
 
-    {site.formspreeId ? (
+    {site.formspreeId && (
       <section class="border-t border-line py-16">
           <h2 class="text-heading text-fg mb-2">Send a message</h2>
           <p class="mb-8 text-muted">I reply within a couple of days.</p>
@@ -110,18 +117,12 @@ const inputClass =
             <button
               id="submit-btn"
               type="submit"
-              class="inline-flex items-center gap-2 rounded-lg bg-fg text-canvas px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              class="btn btn-primary disabled:cursor-not-allowed disabled:opacity-60"
             >
               Send message
             </button>
           </form>
       </section>
-    ) : (
-      methods.length > 0 && (
-        <p class="-mt-10 pb-16 text-muted">
-          Reach me directly through any of the above — I reply within a couple of days.
-        </p>
-      )
     )}
 
     <section class="border-t border-line py-16">
@@ -144,8 +145,7 @@ const inputClass =
     const success = document.getElementById('form-success');
     const error = document.getElementById('form-error');
 
-    if (!form || form.dataset.bound) return;
-    form.dataset.bound = 'true';
+    if (!form) return;
 
     // Native constraint validation runs before this fires, so only valid forms get here.
     form.addEventListener('submit', async (e) => {
@@ -182,5 +182,4 @@ const inputClass =
   }
 
   initContactForm();
-  document.addEventListener('astro:after-swap', initContactForm);
 </script>

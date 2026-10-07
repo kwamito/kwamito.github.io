@@ -5,7 +5,6 @@ problem: "As data volume grew, the ad-hoc queries behind management reports star
 impact: "Reporting queries went from 2–5 minute runtimes to under 500 ms. Dashboard data refreshes on a predictable schedule, and report traffic no longer blocks the admin or competes with transactional writes."
 tags: ["Python", "Django", "PostgreSQL", "Materialized views", "Celery", "REST API", "GCP"]
 order: 2
-featured: false
 role: "Lead Backend Engineer"
 metrics:
   - { value: "<500ms", label: "Report queries, down from 2–5 minutes" }
@@ -17,7 +16,7 @@ stack: ["Django", "PostgreSQL", "Materialized views", "Celery", "Cloud SQL"]
 
 ## Overview
 
-The source system was a high-volume transactional platform built on Django and PostgreSQL. As record counts climbed into the hundreds of thousands, the management reporting layer hit a wall: reports that were instant on a small dataset started timing out, and the admin interface would block for minutes while they ran. The fix wasn't bigger hardware — it was rethinking where and how the aggregation happened.
+The source system was a high-volume transactional platform built on Django and PostgreSQL. As record counts climbed into the hundreds of thousands, the management reporting layer hit a wall: reports that were instant on a small dataset started timing out, and the admin interface would block for minutes while they ran. Bigger hardware would not have fixed it. The fix was to change where and how the aggregation happened.
 
 This project is the reporting subsystem: materialized views, indexes, scheduled refreshes and API endpoints that deliver fast, accurate management reporting without touching the performance of the transactional workload.
 
@@ -74,4 +73,4 @@ Each new materialized view needed historical data. I wrote management commands t
 
 Database performance work starts with measurement. I spent time with `EXPLAIN ANALYZE`, `pg_stat_statements` and slow-query logs before writing any application code. Knowing where the time actually went — sequential scans, sorts, join strategies — told me exactly what to change.
 
-Materialized views are one of PostgreSQL's most underused features for this kind of problem. They aren't a cache; they're first-class database objects with their own statistics and full query-planner support.
+Materialized views are one of PostgreSQL's most underused features for this kind of problem. A materialized view is a real database object with its own statistics and full query-planner support, which makes it more than a cache.

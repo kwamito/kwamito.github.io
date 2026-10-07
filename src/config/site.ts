@@ -1,20 +1,34 @@
-// Single source for contact details and profile links.
+// Single source for identity, contact details and profile links.
 // Anything left `null` is hidden from the site instead of rendering a dead link.
-export const site = {
+export interface SiteConfig {
+  name: string;
+  shortName: string;
+  role: string;
+  location: string;
+  timeZone: string;
+  availability: string;
+  email: string | null;
+  github: string | null;
+  linkedin: string | null;
+  cv: string | null;
+  formspreeId: string | null;
+}
+
+export const site: SiteConfig = {
   name: 'Nana Kwame Oparrey Kuhney',
   shortName: 'Nana Kwame',
-  role: 'Backend Engineer',
+  role: 'Lead Backend Engineer',
   location: 'Accra, Ghana',
   timeZone: 'Africa/Accra',
   availability: 'Open to senior backend roles and contracts',
 
-  email: 'kuhneykwame@gmail.com' as string | null,
+  email: 'kuhneykwame@gmail.com',
   github: 'https://github.com/kwamito',
-  linkedin: 'https://www.linkedin.com/in/kwame-kuhney/' as string | null,
-  cv: null as string | null, // TODO: set to '/cv.pdf' once public/cv.pdf exists
+  linkedin: 'https://www.linkedin.com/in/kwame-kuhney/',
+  cv: null, // TODO: set to '/cv.pdf' once public/cv.pdf exists
 
   // TODO: create a form at https://formspree.io and paste its ID here. The form is hidden until set.
-  formspreeId: null as string | null,
+  formspreeId: null,
 };
 
 export const displayUrl = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');

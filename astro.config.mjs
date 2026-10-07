@@ -7,6 +7,8 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://kwamito.github.io',
   output: 'static',
+  // GitHub Pages serves /foo/ and 301s /foo → /foo/; match it so canonicals and links never redirect.
+  trailingSlash: 'always',
   markdown: {
     shikiConfig: {
       // Dual themes: colours are emitted as --shiki-light / --shiki-dark CSS

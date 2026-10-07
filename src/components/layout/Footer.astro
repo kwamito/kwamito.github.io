@@ -1,23 +1,29 @@
 ---
 import { site, displayUrl } from '../../config/site';
+import { compact } from '../../lib/compact';
+import StatusDot from '../ui/StatusDot.astro';
 
 const year = new Date().getFullYear();
+const tzLabel =
+  new Intl.DateTimeFormat('en-GB', { timeZone: site.timeZone, timeZoneName: 'short' })
+    .formatToParts(new Date())
+    .find((p) => p.type === 'timeZoneName')?.value ?? '';
 
-const links = [
+const links = compact([
   site.email && { label: site.email, href: `mailto:${site.email}`, external: false },
   site.github && { label: displayUrl(site.github), href: site.github, external: true },
   site.linkedin && { label: 'LinkedIn', href: site.linkedin, external: true },
   site.cv && { label: 'CV (PDF)', href: site.cv, external: false },
-].filter(Boolean) as { label: string; href: string; external: boolean }[];
+]);
 ---
 
-<footer class="border-t border-line mt-32">
+<footer class="border-t border-line mt-8">
   <div class="wrap py-14 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
     <div>
       <p class="font-semibold tracking-tight text-fg">{site.shortName}</p>
       <p class="mt-1 text-sm text-muted">{site.role} · {site.location}</p>
       <p class="mt-5 inline-flex items-center gap-2 text-sm text-muted">
-        <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+        <StatusDot />
         {site.availability}
       </p>
     </div>
@@ -36,14 +42,14 @@ const links = [
             </a>
           </li>
         ))}
-        <li><a href="/contact" class="link text-muted hover:text-fg">Contact</a></li>
+        <li><a href="/contact/" class="link text-muted hover:text-fg">Contact</a></li>
       </ul>
     </div>
 
     <div>
       <p class="eyebrow mb-3">Local time</p>
       <p class="font-mono text-sm text-fg tabular">
-        <time id="local-time" data-tz={site.timeZone}>—</time>{" "}<span class="text-subtle">GMT</span>
+        <time id="local-time" data-tz={site.timeZone}>—</time>{" "}<span class="text-subtle">{tzLabel}</span>
       </p>
       <p class="mt-1 text-sm text-muted">{site.location}</p>
     </div>

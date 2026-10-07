@@ -1,10 +1,13 @@
 ---
 import Layout from '../../components/layout/Layout.astro';
-import { getCollection, render } from 'astro:content';
+import BackLink from '../../components/ui/BackLink.astro';
+import PrevNext from '../../components/ui/PrevNext.astro';
+import { render } from 'astro:content';
+import { site } from '../../config/site';
+import { getPublishedPosts, readingTime, formatDate } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('writing', ({ data }) => !data.draft);
-  const sorted = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  const sorted = await getPublishedPosts();
   return sorted.map((post, index) => ({
     params: { slug: post.id },
     props: {
@@ -17,32 +20,33 @@ export async function getStaticPaths() {
 
 const { post, older, newer } = Astro.props;
 const { Content } = await render(post);
-const { title, description, date, tags = [] } = post.data;
+const { title, description, date, tags } = post.data;
+const minutes = readingTime(post.body ?? '');
 
-// Reading time at ~200 wpm.
-const wordCount = (post.body ?? '').split(/\s+/).filter(Boolean).length;
-const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-
-const formattedDate = date.toLocaleDateString('en-GB', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
+const postUrl = new URL(Astro.url.pathname, Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: date.toISOString(),
+  url: postUrl,
+  mainEntityOfPage: postUrl,
+  image: new URL('/og-image.png', Astro.site).href,
+  keywords: tags.length > 0 ? tags.join(', ') : undefined,
+  author: { '@type': 'Person', name: site.name, url: new URL('/', Astro.site).href },
+};
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} type="article" publishedTime={date} jsonLd={jsonLd}>
   <article class="wrap-narrow py-16 sm:py-20">
-    <a href="/writing" class="inline-flex items-center gap-2 text-sm text-muted hover:text-fg transition-colors">
-      <span aria-hidden="true" class="font-mono">←</span>
-      All writing
-    </a>
+    <BackLink href="/writing/" label="All writing" />
 
     <header class="mt-10 mb-12 border-b border-line pb-10">
       <p class="eyebrow tabular">
-        <time datetime={date.toISOString()}>{formattedDate}</time>
+        <time datetime={date.toISOString()}>{formatDate(date, 'long')}</time>
         <span class="px-2" aria-hidden="true">·</span>
-        <span>{readingTime} min read</span>
+        <span>{minutes} min read</span>
       </p>
       <h1 class="mt-4 text-title text-fg text-balance">{title}</h1>
       <p class="mt-5 text-lg sm:text-xl text-muted leading-relaxed text-pretty">{description}</p>
@@ -57,27 +61,12 @@ const formattedDate = date.toLocaleDateString('en-GB', {
       <Content />
     </div>
 
-    <nav class="mt-20 grid grid-cols-2 gap-6 border-t border-line pt-8" aria-label="More writing">
-      <div>
-        {older && (
-          <a href={`/writing/${older.id}`} class="group block">
-            <span class="eyebrow">← Older</span>
-            <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
-              {older.data.title}
-            </span>
-          </a>
-        )}
-      </div>
-      <div class="text-right">
-        {newer && (
-          <a href={`/writing/${newer.id}`} class="group block">
-            <span class="eyebrow">Newer →</span>
-            <span class="mt-2 block text-base font-medium text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
-              {newer.data.title}
-            </span>
-          </a>
-        )}
-      </div>
-    </nav>
+    <PrevNext
+      label="More writing"
+      prev={older && { href: `/writing/${older.id}/`, title: older.data.title }}
+      next={newer && { href: `/writing/${newer.id}/`, title: newer.data.title }}
+      prevLabel="← Older"
+      nextLabel="Newer →"
+    />
   </article>
 </Layout>
