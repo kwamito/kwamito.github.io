@@ -10,7 +10,7 @@ import SkillCard from '../components/SkillCard.astro';
 import { getCollection } from 'astro:content';
 
 const allProjects = await getCollection('projects');
-const featuredProjects = allProjects
+const [leadProject, ...otherProjects] = allProjects
   .sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99))
   .slice(0, 3);
 
@@ -19,131 +19,124 @@ const latestPosts = allPosts
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
+function readingTime(body: string) {
+  const words = body.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 const coreSkills = [
   {
-    icon: 'backend' as const,
-    title: 'Core Backend',
-    description: 'Python & Django ecosystem',
+    title: 'Core backend',
+    description: 'APIs, background jobs and domain logic in the Python and Django ecosystem.',
     skills: ['Python', 'Django', 'DRF', 'REST APIs', 'Celery'],
   },
   {
-    icon: 'database' as const,
-    title: 'Databases',
-    description: 'PostgreSQL & data modeling',
+    title: 'Data',
+    description: 'PostgreSQL as the source of truth, modelled and tuned for reporting at volume.',
     skills: ['PostgreSQL', 'Query optimization', 'Indexing', 'Materialized views'],
   },
   {
-    icon: 'cloud' as const,
-    title: 'Cloud & Infrastructure',
-    description: 'GCP & container deployments',
+    title: 'Cloud & delivery',
+    description: 'Containerised services on Google Cloud with automated pipelines.',
     skills: ['GCP', 'Cloud Run', 'Cloud SQL', 'Docker', 'GitHub Actions'],
   },
 ];
+
+const section = 'border-t border-line py-20 sm:py-28';
+const moreLink = 'link text-sm font-medium';
 ---
 
 <Layout
   title="Home"
-  description="Nana Kwame Oparrey Kuhney — Backend engineer based in Ghana. I build reliable, scalable production systems: payment platforms, APIs, and cloud infrastructure."
+  description="Nana Kwame Oparrey Kuhney — lead backend engineer in Accra, Ghana. Scholarship lifecycle platforms, reporting engines and cloud infrastructure built with Django, PostgreSQL and Google Cloud."
 >
   <Hero />
   <StatsStrip />
 
-  <!-- Featured Projects -->
-  <section class="py-20 max-w-6xl mx-auto px-4 sm:px-6">
-    <SectionHeading
-      label="case studies"
-      title="Production systems I've built."
-      subtitle="Not side projects — real systems handling real load, real money, and real consequences."
-    />
+  <section class={section}>
+    <div class="wrap">
+      <SectionHeading
+        label="Selected work"
+        title="Systems in production."
+        subtitle="Architecture, trade-offs and outcomes from the platforms I lead."
+      />
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {featuredProjects.map((project) => (
-        <ProjectCard
-          title={project.data.title}
-          description={project.data.description}
-          problem={project.data.problem}
-          impact={project.data.impact}
-          tags={project.data.tags}
-          slug={project.id}
-          featured={project.data.featured}
+      <div class="grid gap-6 md:grid-cols-2">
+        {leadProject && (
+          <div class="md:col-span-2">
+            <ProjectCard
+              size="lead"
+              index={1}
+              title={leadProject.data.title}
+              description={leadProject.data.description}
+              problem={leadProject.data.problem}
+              impact={leadProject.data.impact}
+              tags={leadProject.data.tags}
+              slug={leadProject.id}
+            />
+          </div>
+        )}
+        {otherProjects.map((project, i) => (
+          <ProjectCard
+            index={i + 2}
+            title={project.data.title}
+            description={project.data.description}
+            problem={project.data.problem}
+            impact={project.data.impact}
+            tags={project.data.tags}
+            slug={project.id}
+          />
+        ))}
+      </div>
+
+      <p class="mt-10"><a href="/projects" class={moreLink}>All case studies</a></p>
+    </div>
+  </section>
+
+  <section class={section}>
+    <div class="wrap grid gap-x-12 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <SectionHeading
+          label="Capabilities"
+          title="Where I do my best work."
         />
-      ))}
-    </div>
-
-    <div class="mt-10 text-center">
-      <a
-        href="/projects"
-        class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-      >
-        View all case studies
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </a>
-    </div>
-  </section>
-
-  <!-- Skills snapshot -->
-  <section class="py-16 bg-slate-50/80 dark:bg-gray-900/30 border-y border-slate-200 dark:border-gray-800">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6">
-      <SectionHeading
-        label="skills"
-        title="What I work with."
-        subtitle="Tools I use daily, not just things I've touched once."
-      />
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {coreSkills.map((s) => (
-          <SkillCard
-            title={s.title}
-            description={s.description}
-            skills={s.skills}
-            icon={s.icon}
-          />
-        ))}
       </div>
-      <div class="mt-8">
-        <a
-          href="/skills"
-          class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-        >
-          See full skills breakdown
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
+      <div class="lg:col-span-8">
+        <div class="border-b border-line">
+          {coreSkills.map((s) => (
+            <SkillCard title={s.title} description={s.description} skills={s.skills} />
+          ))}
+        </div>
+        <p class="mt-10"><a href="/skills" class={moreLink}>Full skills breakdown</a></p>
       </div>
     </div>
   </section>
 
-  <!-- Latest writing -->
   {latestPosts.length > 0 && (
-    <section class="py-20 max-w-6xl mx-auto px-4 sm:px-6">
-      <SectionHeading
-        label="writing"
-        title="Notes from the backend."
-        subtitle="Practical lessons from building and running production systems."
-      />
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {latestPosts.map((post) => (
-          <BlogCard
-            title={post.data.title}
-            description={post.data.description}
-            date={post.data.date}
-            tags={post.data.tags}
-            slug={post.id}
+    <section class={section}>
+      <div class="wrap grid gap-x-12 lg:grid-cols-12">
+        <div class="lg:col-span-4">
+          <SectionHeading
+            label="Writing"
+            title="Notes from the backend."
+            subtitle="Lessons from building and operating production systems."
           />
-        ))}
-      </div>
-      <div class="mt-8">
-        <a
-          href="/writing"
-          class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-        >
-          Read all articles
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
+        </div>
+        <div class="lg:col-span-8">
+          <div class="border-b border-line">
+            {latestPosts.map((post) => (
+              <BlogCard
+                title={post.data.title}
+                description={post.data.description}
+                date={post.data.date}
+                tags={post.data.tags}
+                slug={post.id}
+                readingTime={readingTime(post.body ?? '')}
+              />
+            ))}
+          </div>
+          <p class="mt-10"><a href="/writing" class={moreLink}>All writing</a></p>
+        </div>
       </div>
     </section>
   )}

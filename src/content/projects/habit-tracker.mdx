@@ -1,0 +1,94 @@
+---
+title: "Habit Tracker — Offline, Honest Habit Tracking"
+description: "A personal, offline habit tracker for Android with build and reduce habits, versioned rules that never rewrite history, and a layered architecture around a pure domain core. No account, no server, no analytics."
+problem: "Most habit apps quietly reward silence — a day you never logged counts as a success — and editing a habit's goal retroactively rewrites your past. I wanted a tracker that judges each day honestly, keeps data on the device, and stays correct across double taps, restarts and timezone edge cases."
+impact: "A complete offline habit tracker where every write is idempotent, derived state is always recomputed from raw records, and each day is judged by the rules in force that day — backed by 118 Jest tests and a performance test at 50 habits and 20,000 entries."
+tags: ["React Native", "Expo", "TypeScript", "SQLite", "Android", "Jest"]
+order: 5
+featured: false
+role: "Sole developer — personal project"
+period: "2026"
+metrics:
+  - { value: "118", label: "Jest tests in 11 files, persistence against real SQLite" }
+  - { value: "32 ms", label: "Per save at 50 habits / 20,000 entries (Node)" }
+  - { value: "0", label: "Accounts, servers or analytics" }
+stack: ["Expo SDK 57", "React Native 0.86", "React 19", "TypeScript (strict)", "Expo Router", "expo-sqlite", "Luxon", "Jest"]
+screenshots:
+  - src: "/projects/habit-tracker/1-today.jpg"
+    alt: "Habit Tracker Today screen: daily progress ring, level and XP, a reduce-habit summary, and habits due this evening with streaks"
+  - src: "/projects/habit-tracker/2-progress.jpg"
+    alt: "Habit Tracker Progress screen: level and total XP, weekly XP, badges, time tracked, and XP per week over the last eight weeks"
+  - src: "/projects/habit-tracker/3-garden.jpg"
+    alt: "Habit Tracker Garden screen: an illustrated garden that grows with level, with unlockable sky decorations"
+  - src: "/projects/habit-tracker/4-habits.jpg"
+    alt: "Habit Tracker Habits list: build and reduce habits filtered by type, each with its status and streak"
+  - src: "/projects/habit-tracker/5-habit-calendar.jpg"
+    alt: "Habit Tracker habit details: a 30-day history calendar marking target met, minimum effort and missed days, followed by a day-by-day log"
+---
+
+
+## Overview
+
+Habit Tracker is a personal, offline habit tracker for Android. There's no account, no server and no analytics — everything stays on the device. It's a personal project, built as release APKs and sideloaded.
+
+It supports two kinds of habit:
+
+- **Build habits** — tracked as done, an amount, or a time; scheduled daily, on chosen weekdays, or N days per week; with a minimum and a stretch goal.
+- **Reduce habits** — avoid something entirely or stay under a limit, with incident logging, triggers, a replacement action and an urge timer. A day only counts once it's confirmed: silence is never a success.
+
+Around that: streaks, rates shown with their denominators, calendars, XP and levels, badges, and a garden that never wilts. Local reminders, a daily reflection and weekly review, JSON backup and CSV export, a biometric app lock, and a native module that hides the app's contents in the recents preview.
+
+## The Challenge
+
+Habit tracking looks simple and isn't:
+
+- **Rules change.** If I raise a goal from 20 to 30 minutes today, last month's days must still be judged against 20.
+- **Taps repeat.** A double tap, a retry or an app restart mid-save must never log an entry twice or award XP twice.
+- **Time is messy.** Day boundaries, weeks, travel and daylight-saving transitions all affect what "today" means and when a reminder fires.
+- **Streaks feel unfair** if they break at midnight because the app didn't wait for you to log today.
+
+## Architecture
+
+### Layers with a pure core
+
+The app is layered: screens → application services → pure domain → data → device adapters. The domain layer is about 2,850 lines with no database, no clock and no React — the clock is injected — so every rule can be tested in isolation.
+
+### Single writer, idempotent operations
+
+Every write goes through one queue and runs inside a transaction. Each write carries an operation id that's recorded in an operations table, so double taps, retries and restarts never duplicate entries or XP.
+
+### Derived state is never stored
+
+XP, badges and streaks are recomputed from raw records rather than stored. Nothing can drift out of sync, and restoring a backup simply rebuilds them.
+
+### Versioned habit rules
+
+Habit rules are stored as revisions with an effective date. Each day is judged by the rules in force that day, so edits take effect tomorrow — or next Monday for weekly goals — and never rewrite history.
+
+### Persistence
+
+expo-sqlite with six versioned migrations. Amounts are stored as integer hundredths and durations as integer seconds, so there's no floating-point drift.
+
+## Technical Highlights
+
+### Time handled deliberately
+
+The user picks a fixed timezone at onboarding. Dates are stored as `YYYY-MM-DD` keys, weeks start on Monday, and reminder times handle DST gaps and overlaps explicitly, using Luxon.
+
+### A streak rule that's fair
+
+Today can extend a streak but never break it before the day ends — an unlogged morning doesn't wipe out a month of progress.
+
+### A pure reminder planner
+
+The reminder planner is a pure function: it schedules the nearest 48 reminders within the next 7 days, diffs that against what's already scheduled, and applies only the difference.
+
+### Tested and measured
+
+118 Jest tests in 11 files, with persistence tested against real SQLite in Node. A performance test at 50 habits and 20,000 entries measured (in Node) 0.7 s to compute the Today screen, 1.5 s for launch catch-up and 32 ms for a save.
+
+## What I Learned
+
+Most of the hard problems were about history and time, not UI. Versioned rules, idempotent writes and recomputed derived state each eliminated a category of bug outright instead of patching symptoms.
+
+Keeping the domain pure — with the clock injected — paid for itself immediately: timezone, DST and streak edge cases became ordinary unit tests.

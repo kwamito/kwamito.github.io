@@ -6,7 +6,7 @@
   id="theme-toggle"
   aria-label="Toggle dark mode"
   title="Toggle dark mode"
-  class="relative flex items-center justify-center w-9 h-9 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-gray-800 transition-colors duration-150 focus-visible:outline-blue-500"
+  class="relative flex items-center justify-center w-9 h-9 rounded-lg text-muted hover:text-fg hover:bg-sunken transition-colors duration-150"
 >
   <!-- Sun icon (shown in dark mode) -->
   <svg
@@ -16,7 +16,7 @@
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    stroke-width="2"
+    stroke-width="1.75"
     stroke-linecap="round"
     stroke-linejoin="round"
     aria-hidden="true"
@@ -33,7 +33,7 @@
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    stroke-width="2"
+    stroke-width="1.75"
     stroke-linecap="round"
     stroke-linejoin="round"
     aria-hidden="true"
@@ -60,14 +60,12 @@
 
     btn?.addEventListener('click', () => {
       html.classList.toggle('dark');
-      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+      try {
+        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+      } catch {}
       update();
     });
   }
 
-  // Run on initial load
   initTheme();
-
-  // Re-run on Astro view transitions if used
-  document.addEventListener('astro:after-swap', initTheme);
 </script>

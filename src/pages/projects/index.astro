@@ -10,32 +10,36 @@ const sorted = projects.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 9
 
 <Layout
   title="Projects"
-  description="Case studies of production backend systems built by Nana Kwame Oparrey Kuhney — payment platforms, government services, cloud infrastructure, and more."
+  description="Case studies of production backend systems built by Nana Kwame Oparrey Kuhney — a scholarship lifecycle platform, reporting, cloud infrastructure and local-first mobile apps."
 >
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+  <div class="wrap py-16 sm:py-20">
     <SectionHeading
-      label="projects"
-      title="Production systems & case studies."
-      subtitle="Each project represents a real system built for real use. The problems were hard, the stakes were real, and the solutions had to work."
+      as="h1"
+      label="Projects"
+      title="Production systems, written up as case studies."
+      subtitle="A scholarship platform, reporting, infrastructure and two local-first mobile apps. For each: the problem, how the system is built, and what changed."
     />
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {sorted.map((project) => (
-        <ProjectCard
-          title={project.data.title}
-          description={project.data.description}
-          problem={project.data.problem}
-          impact={project.data.impact}
-          tags={project.data.tags}
-          slug={project.id}
-          featured={project.data.featured}
-        />
+    <div class="grid gap-6 md:grid-cols-2">
+      {sorted.map((project, index) => (
+        <div class:list={['grid', index === 0 && 'md:col-span-2']}>
+          <ProjectCard
+            title={project.data.title}
+            description={project.data.description}
+            problem={project.data.problem}
+            impact={project.data.impact}
+            tags={project.data.tags}
+            slug={project.id}
+            featured={project.data.featured}
+            index={index + 1}
+            size={index === 0 ? 'lead' : 'default'}
+          />
+        </div>
       ))}
     </div>
 
-    <!-- Note about confidentiality -->
-    <p class="mt-12 text-sm text-slate-500 dark:text-slate-500 text-center max-w-xl mx-auto">
-      Some systems involve government and financial infrastructure. Case studies describe technical architecture and outcomes without exposing sensitive operational details.
+    <p class="mt-12 font-mono text-xs text-subtle">
+      Client names and sensitive operational details are withheld.
     </p>
   </div>
 </Layout>

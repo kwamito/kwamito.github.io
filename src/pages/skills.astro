@@ -1,58 +1,43 @@
 ---
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
-import SkillCard from '../components/SkillCard.astro';
-import CTASection from '../components/home/CTASection.astro';
 
-const skillGroups = [
+const areas = [
   {
-    icon: 'backend' as const,
-    title: 'Core Backend',
-    description: 'The tools I think in — daily drivers for APIs, business logic, and data processing.',
-    depth: '3+ years · 5+ production systems · primary daily stack',
-    skills: ['Python 3', 'Django', 'Django REST Framework', 'Celery', 'REST API design', 'Async tasks', 'Webhooks', 'Background jobs'],
+    title: 'Core backend',
+    use: 'REST API design, business logic, async tasks, webhooks and background jobs across 5+ production systems.',
+    tools: ['Python', 'Django', 'Django REST Framework', 'Celery', 'Redis', 'pytest', 'OpenAPI'],
   },
   {
-    icon: 'database' as const,
-    title: 'Databases & Storage',
-    description: 'Where the truth lives. Query correctness and performance are non-negotiable.',
-    depth: '3+ years PostgreSQL · optimized for 500K+ record workloads',
-    skills: ['PostgreSQL', 'Query optimization', 'Indexing strategies', 'Materialized views', 'Transactions', 'Data modeling', 'Migrations', 'Google Cloud Storage'],
+    title: 'Databases & storage',
+    use: 'Data modelling, indexing, materialized views and query optimisation for 500K+ record workloads.',
+    tools: ['PostgreSQL', 'Cloud SQL', 'Google Cloud Storage'],
   },
   {
-    icon: 'cloud' as const,
-    title: 'Cloud & Infrastructure',
-    description: 'GCP-native deployments, managed services, and container orchestration.',
-    depth: '2+ years GCP · production deployments on Cloud Run + Cloud SQL',
-    skills: ['Google Cloud Platform', 'Cloud Run', 'Cloud SQL', 'Cloud Storage', 'Secret Manager', 'Pub/Sub', 'Docker', 'Container Registry'],
+    title: 'Cloud & infrastructure',
+    use: 'GCP-native production deployments on managed services and containers.',
+    tools: ['GCP', 'Cloud Run', 'Cloud SQL', 'Pub/Sub', 'Docker', 'Nginx', 'Linux'],
   },
   {
-    icon: 'cicd' as const,
-    title: 'CI/CD & Automation',
-    description: "Reliable, repeatable deployments that I don't have to think about.",
-    depth: 'Automated pipelines across all production services',
-    skills: ['GitHub Actions', 'Docker builds', 'Automated testing pipelines', 'Zero-downtime deploys', 'Environment promotion', 'Secrets in CI'],
+    title: 'CI/CD & automation',
+    use: 'Zero-downtime deploys, automated test pipelines and environment promotion across all production services.',
+    tools: ['GitHub Actions', 'Docker', 'Git'],
   },
   {
-    icon: 'observability' as const,
-    title: 'Observability & Reliability',
-    description: 'You can only trust a system you can see. Monitoring is part of the design, not an afterthought.',
-    depth: 'Production monitoring across payment + government platforms',
-    skills: ['Sentry / GlitchTip', 'Structured logging', 'Error tracking', 'Performance profiling', 'Slow query analysis', 'Health checks', 'Alerts'],
+    title: 'Observability',
+    use: 'Error tracking, structured logging, slow-query analysis, health checks and alerting across production platforms.',
+    tools: ['GlitchTip / Sentry', 'Structured logging'],
   },
   {
-    icon: 'security' as const,
     title: 'Security',
-    description: 'Secure by default — authentication, secrets management, and API hardening.',
-    depth: 'Financial & government systems · zero tolerance for misconfigs',
-    skills: ['Token-based auth', 'OAuth 2.0', 'Signed URLs', 'GCP Secret Manager', 'API rate limiting', 'HTTPS enforcement', 'Secrets rotation', 'CORS policy'],
+    use: 'Token auth, secret rotation, signed URLs, rate limiting and CORS policy for multi-role platforms with sensitive records.',
+    tools: ['OAuth 2.0', 'GCP Secret Manager', 'Signed URLs'],
   },
-];
-
-const alsoKnow = [
-  'Git', 'Linux', 'Nginx', 'Redis', 'Postman', 'pgAdmin', 'VS Code',
-  'Markdown', 'JSON:API', 'OpenAPI / Swagger', 'Django Admin', 'Django Signals',
-  'Django ORM', 'pytest', 'factory_boy', 'Python dataclasses',
+  {
+    title: 'Mobile (personal projects)',
+    use: 'Local-first Android apps that work offline, with on-device storage, idempotent writes and thorough automated tests.',
+    tools: ['Expo', 'React Native', 'TypeScript', 'SQLite'],
+  },
 ];
 ---
 
@@ -60,47 +45,37 @@ const alsoKnow = [
   title="Skills"
   description="Technical skills of Nana Kwame Oparrey Kuhney — Python, Django, PostgreSQL, GCP, Cloud Run, CI/CD, observability, and backend security."
 >
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-    <SectionHeading
-      label="skills"
-      title="What I know and how I use it."
-      subtitle="Organized by what I actually do with each category — not just a list of words on a page."
-    />
+  <div class="wrap">
+    <header class="pt-16 md:pt-24 animate-fade-up">
+      <SectionHeading
+        as="h1"
+        label="Skills"
+        title="What I know and how I use it."
+        subtitle="Seven areas, what I do with each, and the tools behind it."
+      />
+    </header>
 
-    <!-- Main skills grid -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
-      {skillGroups.map((group) => (
-        <SkillCard
-          title={group.title}
-          depth={group.depth}
-          description={group.description}
-          skills={group.skills}
-          icon={group.icon}
-        />
-      ))}
-    </div>
-
-    <!-- Also comfortable with -->
-    <div class="p-6 md:p-8 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl">
-      <h2 class="font-mono text-xs font-medium tracking-widest text-slate-500 dark:text-slate-500 uppercase mb-5">
-        also comfortable with
-      </h2>
-      <div class="flex flex-wrap gap-2">
-        {alsoKnow.map((skill) => (
-          <span class="px-3 py-1 rounded-lg text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-gray-800 border border-slate-100 dark:border-gray-700">
-            {skill}
-          </span>
+    <section class="border-t border-line py-16 animate-fade-up anim-delay-100" aria-label="Skill areas">
+      <div class="hidden md:grid grid-cols-[13rem_1fr_18rem] gap-x-10 pb-4" aria-hidden="true">
+        <p class="eyebrow">Area</p>
+        <p class="eyebrow">What I do with it</p>
+        <p class="eyebrow">Tools</p>
+      </div>
+      <div class="border-t border-line">
+        {areas.map((area) => (
+          <div class="grid gap-x-10 gap-y-2 border-b border-line py-6 md:grid-cols-[13rem_1fr_18rem]">
+            <h2 class="font-semibold text-fg">{area.title}</h2>
+            <p class="leading-relaxed text-muted">{area.use}</p>
+            <p class="font-mono text-sm leading-relaxed text-subtle md:pt-0.5">{area.tools.join(' · ')}</p>
+          </div>
         ))}
       </div>
-    </div>
+    </section>
 
-    <!-- Philosophy note -->
-    <div class="mt-10 p-6 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-2xl">
-      <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-        <strong class="text-slate-900 dark:text-slate-100 font-semibold">A note on this list:</strong> I don't believe in listing every framework or library I've ever imported. These are tools I understand well enough to build with in production, debug when they break, and reason about under load. If something isn't here, I can likely learn it — but I won't pretend expertise I don't have.
+    <section class="border-t border-line py-12">
+      <p class="text-muted">
+        Need these applied to your system? <a href="/contact" class="link">Get in touch</a>
       </p>
-    </div>
+    </section>
   </div>
-
-  <CTASection />
 </Layout>

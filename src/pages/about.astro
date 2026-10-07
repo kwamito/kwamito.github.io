@@ -1,7 +1,7 @@
 ---
 import Layout from '../components/layout/Layout.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
-import CTASection from '../components/home/CTASection.astro';
+import { site } from '../config/site';
 
 const values = [
   {
@@ -10,126 +10,116 @@ const values = [
   },
   {
     title: 'Observability from day one',
-    body: 'A system you cannot see is a system you cannot trust. Logging, structured errors, and monitoring are not afterthoughts — they are part of the design.',
+    body: 'A system you cannot see is a system you cannot trust. Logging, structured errors and monitoring are part of the design, not afterthoughts.',
   },
   {
     title: 'Simple architectures that scale',
-    body: 'The right tool is usually the boring tool. I reach for complexity only when simplicity has genuinely run out of room.',
+    body: 'The right tool is usually the boring tool. I reach for complexity only when simplicity has run out of room.',
   },
   {
     title: 'Documentation as a first-class concern',
-    body: 'A well-documented API and a clear README are forms of respect for the people who come after you — including future you.',
+    body: 'A well-documented API and a clear README are a form of respect for the people who come after you — including future you.',
   },
 ];
+
+const facts = [
+  site.location && { label: 'Location', value: site.location },
+  { label: 'Role', value: 'Lead Backend Engineer, Effect Studios' },
+  { label: 'Primary stack', value: 'Python · Django · PostgreSQL · GCP', mono: true },
+  { label: 'Interests', value: 'Distributed systems, API design, performance' },
+  site.availability && { label: 'Open to', value: site.availability },
+  { label: 'Languages', value: 'English, Twi' }, // TODO: update
+].filter(Boolean) as { label: string; value: string; mono?: boolean }[];
+
+// Body copy for the reading sections. Not using .prose-content here:
+// its paragraph margins doubled up with space-y and left uneven gaps.
+const body = 'space-y-5 text-[1.0625rem] leading-[1.75] text-muted';
+const h2 = 'text-heading text-fg mb-6';
 ---
 
 <Layout
   title="About"
   description="Nana Kwame Oparrey Kuhney — backend engineer based in Ghana. How I got here, how I work, and what I believe about building software."
 >
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-    <!-- Header -->
-    <div class="mb-16 animate-fade-up">
-      <p class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-4">
-        about
-      </p>
-      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-6">
-        Building software in Ghana,<br />for the world.
-      </h1>
-      <p class="text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
-        I'm Nana Kwame Oparrey Kuhney — a backend engineer based in Accra, Ghana. I design and build the parts of software systems that people don't see but depend on every day.
-      </p>
-    </div>
+  <div class="wrap-narrow">
+    <header class="pt-16 md:pt-24 animate-fade-up">
+      <SectionHeading
+        as="h1"
+        label="About"
+        title="Building software in Ghana, for the world."
+        subtitle="I'm Nana Kwame Oparrey Kuhney — a backend engineer based in Accra. I design and build the parts of software systems that people don't see but depend on every day."
+      />
+    </header>
 
-    <!-- Story -->
-    <div class="prose-content space-y-6 mb-16 animate-fade-up delay-100">
-      <h2>Who I am</h2>
-      <p>
-        My work lives at the intersection of APIs, data systems, and cloud infrastructure. I've built payment processing systems that move real money, government-grade service platforms that citizens depend on, and reporting pipelines that give teams visibility into what their systems are actually doing.
-      </p>
-      <p>
-        I currently work as Lead Backend Engineer at
-        <strong>Effect Studios Limited</strong>, where I own the backend
-        architecture and production operations for several platforms — including
-        a national-scale payment system that processes tens of thousands of
-        transactions every day.
-      </p>
-      <p>
-        I'm based in Ghana, and I think that context matters. Building systems
-        for West African infrastructure — the network conditions, the payment
-        ecosystem, the regulatory environment — has sharpened my instincts in
-        ways that purely academic environments can't replicate.
-      </p>
+    <section class="border-t border-line py-16 animate-fade-up anim-delay-100">
+      <h2 class={h2}>Who I am</h2>
+      <div class={body}>
+        <p>
+          My work lives at the intersection of APIs, data systems and cloud infrastructure. I've built multi-stage approval workflows where every decision is on the record, reporting engines that answer in milliseconds instead of minutes, and the cloud pipelines that ship them.
+        </p>
+        <p>
+          I'm Lead Backend Engineer at <strong class="font-medium text-fg">Effect Studios Limited</strong>, where I own the backend architecture and production operations for several platforms — including the backend for the GETFund scholarship programme, which runs the whole award lifecycle from application through completion and return for applicants and around 15 staff roles.
+        </p>
+        <p>
+          Outside work I build local-first Android apps for the same conditions: Stash, an offline-first budgeting app built for Ghana, and a habit tracker built around idempotent writes. Building for West African infrastructure and its network conditions has sharpened my instincts for systems that hold up in the real world.
+        </p>
+      </div>
+    </section>
 
-      <h2>How I work</h2>
-      <p>
-        I believe good engineering is a discipline, not a talent. It shows up in the things you choose to prioritize before the system breaks, not after:
+    <section class="border-t border-line py-16">
+      <h2 class={h2}>How I work</h2>
+      <p class={body}>
+        Good engineering is a discipline, not a talent. It shows up in what you prioritise before the system breaks, not after.
       </p>
-    </div>
+      <ol class="mt-8 border-t border-line">
+        {values.map((v, i) => (
+          <li class="grid grid-cols-[2.5rem_1fr] gap-x-4 border-b border-line py-5 last:border-b-0">
+            <span class="font-mono text-xs text-subtle tabular pt-1">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3 class="font-semibold text-fg">{v.title}</h3>
+              <p class="mt-1 text-muted leading-relaxed">{v.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
 
-    <!-- Engineering values grid -->
-    <div class="grid sm:grid-cols-2 gap-4 mb-16 animate-fade-up delay-200">
-      {values.map((v) => (
-        <div class="p-5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl">
-          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-2 text-sm">
-            {v.title}
-          </h3>
-          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            {v.body}
-          </p>
-        </div>
-      ))}
-    </div>
+    <section class="border-t border-line py-16">
+      <h2 class={h2}>Background</h2>
+      <div class={body}>
+        <p>
+          I learned to build software by building it — personal projects, then freelance work, then production responsibility at a company where the stakes were real and the margin for error was narrow.
+        </p>
+        <p>
+          That gave me an early understanding of what it means for a system to fail in production, and the habit of designing so it doesn't. I've debugged slow queries at midnight and traced failures through distributed logs.
+        </p>
+      </div>
+    </section>
 
-    <!-- Background section -->
-    <div class="prose-content mb-16 animate-fade-up delay-300">
-      <h2>Background</h2>
-      <p>
-        I didn't follow a traditional path into engineering. I learned to build software by building software — starting with personal projects, moving to freelance work, and eventually taking on production responsibility at a company where the stakes were real and the margin for error was narrow.
-      </p>
-      <p>
-        That path gave me something a classroom rarely does: an early understanding of what it means for a system to fail in production, and the habit of designing so it doesn't. I've debugged slow queries at midnight, traced payment failures through distributed logs, and learned that "it works on my machine" is not a deployment strategy.
-      </p>
-      <p>
-        I'm a continuous learner — not because I'm trying to keep up with trends, but because the problems I work on keep getting more interesting and I like being equipped to solve them properly.
-      </p>
-
-      <h2>Outside of work</h2>
+    <section class="border-t border-line py-16">
+      <h2 class={h2}>Outside of work</h2>
       {/* TODO: Add a few personal details here — hobbies, interests, etc. */}
-      <p>
-        When I'm not building systems, I'm usually thinking about them. I read widely on distributed systems, database internals, and API design. I believe the best engineers are also good writers — clarity of thought and clarity of communication are the same skill.
+      <p class={body}>
+        I read widely on distributed systems, database internals and API design. The best engineers are also good writers — clarity of thought and clarity of communication are the same skill.
       </p>
-    </div>
+    </section>
 
-    <!-- Quick facts -->
-    <div class="p-6 bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-800 rounded-2xl animate-fade-up delay-400">
-      <h3 class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-5">
-        quick facts
-      </h3>
-      <dl class="grid sm:grid-cols-2 gap-4">
-        {[
-          { label: 'Location', value: 'Accra, Ghana' },
-          { label: 'Current role', value: 'Lead Backend Engineer, Effect Studios' },
-          { label: 'Primary stack', value: 'Python · Django · PostgreSQL · GCP' },
-          { label: 'Interests', value: 'Distributed systems, API design, performance' },
-          { label: 'Open to', value: 'New opportunities & interesting problems' }, // TODO: update as needed
-          { label: 'Languages', value: 'English, Twi' }, // TODO: update
-        ].map(({ label, value }) => (
-          <div>
-            <dt class="font-mono text-xs text-slate-500 dark:text-slate-500 mb-0.5">{label}</dt>
-            <dd class="text-sm font-medium text-slate-800 dark:text-slate-200">{value}</dd>
+    <section class="border-t border-line py-16">
+      <h2 class="eyebrow mb-4">Quick facts</h2>
+      <dl class="border-t border-line">
+        {facts.map(({ label, value, mono }) => (
+          <div class="grid gap-x-6 gap-y-1 border-b border-line py-3 sm:grid-cols-[9rem_1fr]">
+            <dt class="font-mono text-xs text-subtle sm:pt-0.5">{label}</dt>
+            <dd class={`text-sm text-fg ${mono ? 'font-mono' : ''}`}>{value}</dd>
           </div>
         ))}
       </dl>
-    </div>
-  </div>
+    </section>
 
-  <CTASection
-    title="Want to know more?"
-    subtitle="I'm happy to talk about my experience, how I work, and what I'm looking for. Let's have a conversation."
-    primaryLabel="Get In Touch"
-    primaryHref="/contact"
-    secondaryLabel="View My Work"
-    secondaryHref="/projects"
-  />
+    <section class="border-t border-line py-12">
+      <p class="text-muted">
+        Want to talk about a role or a system? <a href="/contact" class="link">Get in touch</a>
+      </p>
+    </section>
+  </div>
 </Layout>

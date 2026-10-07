@@ -1,152 +1,121 @@
 ---
-// Hero section with API response visual
+import { site } from '../../config/site';
 ---
 
-<section class="relative min-h-[92vh] flex items-center overflow-hidden bg-slate-50 dark:bg-gray-950">
-  <!-- Dot grid background -->
-  <div class="absolute inset-0 bg-dot-grid opacity-60 dark:opacity-100 pointer-events-none" aria-hidden="true"></div>
-
-  <!-- Subtle gradient blob -->
-  <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-500/8 rounded-full blur-3xl pointer-events-none translate-x-1/4 -translate-y-1/4" aria-hidden="true"></div>
-  <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/5 dark:bg-cyan-500/6 rounded-full blur-3xl pointer-events-none -translate-x-1/4 translate-y-1/4" aria-hidden="true"></div>
-
-  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 grid lg:grid-cols-2 gap-16 items-center w-full">
-
-    <!-- Left: Text content -->
-    <div class="animate-fade-up">
-      <!-- Label -->
-      <p class="font-mono text-xs font-medium tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-5">
-        Backend Engineer · Ghana, West Africa
+<section class="pt-16 pb-20 sm:pt-24 sm:pb-28">
+  <div class="wrap grid gap-14 lg:grid-cols-12 lg:gap-12 lg:items-center">
+    <div class="lg:col-span-7 animate-fade-up">
+      <p class="eyebrow flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span>Lead Backend Engineer</span>
+        <span aria-hidden="true">·</span>
+        <span>{site.location}</span>
+        {site.availability && (
+          <>
+            <span class="flex basis-full items-center gap-2">
+              <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+              {site.availability}
+            </span>
+          </>
+        )}
       </p>
 
-      <!-- Headline -->
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-slate-50 leading-[1.1] mb-6">
-        I build the systems<br />
-        <span class="text-gradient">behind the systems.</span>
+      <h1 class="mt-6 text-display text-fg text-balance">
+        Backends for multi-stage workflows where every decision is on the record.
       </h1>
 
-      <!-- Subheadline -->
-      <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-8 max-w-xl">
-        Production APIs, payment platforms, and cloud infrastructure — built
-        to be reliable, observable, and ready for real-world load.
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted text-pretty">
+        I design and run Django and PostgreSQL systems on Google Cloud. My flagship is the
+        backend for Ghana's GETFund scholarship programme: the full award lifecycle, fifteen
+        staff roles, multi-stage approvals and a change history on every record that matters.
       </p>
 
-      <!-- CTAs -->
-      <div class="flex flex-wrap gap-3">
+      <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
         <a
           href="/projects"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-150 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/30 hover:-translate-y-px"
+          class="inline-flex items-center rounded-lg bg-fg px-5 py-3 text-sm font-medium text-canvas transition-opacity hover:opacity-85"
         >
-          View My Work
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+          Read the case studies
         </a>
-        <a
-          href="/experience"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900/5 dark:bg-white/5 border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-gray-500 font-semibold rounded-xl transition-all duration-150 hover:-translate-y-px"
-        >
-          My Experience
-        </a>
-        <a
-          href="/contact"
-          class="inline-flex items-center gap-2 px-6 py-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-colors duration-150"
-        >
-          Get In Touch
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
+        <a href="/contact" class="link text-sm font-medium">Get in touch</a>
       </div>
     </div>
 
-    <!-- Right: API response visual -->
-    <div class="hidden lg:block animate-fade-up delay-200">
-      <div class="relative">
-        <!-- Glow effect -->
-        <div class="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/15 rounded-2xl blur-xl" aria-hidden="true"></div>
+    <figure class="lg:col-span-5 animate-fade-up anim-delay-200">
+      <svg
+        viewBox="0 0 480 290"
+        class="w-full max-w-md lg:max-w-none text-line-strong"
+        role="img"
+        aria-labelledby="arch-title arch-desc"
+        fill="none"
+      >
+        <title id="arch-title">Scholarship application approval workflow</title>
+        <desc id="arch-desc">
+          A submitted application moves through four review stages in order: team lead, finance, audit
+          and admin. Admin approval moves it to approved. A reviewer can return it for revision, and the
+          applicant resubmits it into the workflow.
+        </desc>
+        <defs>
+          <marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0.5 L7 4 L0 7.5" fill="none" stroke="var(--subtle)" stroke-width="1.2" />
+          </marker>
+        </defs>
 
-        <!-- Terminal card -->
-        <div class="relative bg-gray-900 dark:bg-gray-950 border border-gray-700 dark:border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-          <!-- Terminal bar -->
-          <div class="flex items-center gap-1.5 px-4 py-3 bg-gray-800 dark:bg-gray-900 border-b border-gray-700 dark:border-gray-800">
-            <span class="w-3 h-3 rounded-full bg-red-500/70"></span>
-            <span class="w-3 h-3 rounded-full bg-yellow-500/70"></span>
-            <span class="w-3 h-3 rounded-full bg-green-500/70"></span>
-            <span class="ml-3 font-mono text-xs text-gray-500">GET /api/v1/engineer/status</span>
-          </div>
+        <!-- Edges -->
+        <g stroke="var(--subtle)" stroke-width="1" marker-end="url(#arch-arrow)">
+          <path d="M134 44 H173" />
+          <path d="M305 44 H344" />
+          <path d="M411 68 V118" />
+          <path d="M346 144 H307" />
+          <path d="M240 168 V218" />
+          <path d="M175 144 H136" stroke-dasharray="3 3" />
+          <path d="M69 120 V70" stroke-dasharray="3 3" />
+        </g>
 
-          <!-- Response content -->
-          <div class="p-6 font-mono text-sm leading-relaxed">
-            <!-- HTTP response line -->
-            <p class="mb-4 text-gray-500">
-              <span class="text-green-400">HTTP/2</span>
-              <span class="text-green-400 ml-2">200</span>
-              <span class="text-gray-400 ml-2">OK</span>
-            </p>
+        <!-- Edge labels -->
+        <g class="font-mono fill-subtle" font-size="10.5">
+          <text x="419" y="97">approve</text>
+          <text x="248" y="197">approve</text>
+          <text x="155" y="136" text-anchor="middle">return</text>
+          <text x="61" y="98" text-anchor="end">resubmit</text>
+        </g>
 
-            <!-- JSON body -->
-            <div class="text-gray-300 space-y-1">
-              <p><span class="text-gray-600">{"{"}</span></p>
-              <p class="pl-4">
-                <span class="text-blue-300">"name"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-green-300">"Nana Kwame Oparrey Kuhney"</span>
-                <span class="text-gray-600">,</span>
-              </p>
-              <p class="pl-4">
-                <span class="text-blue-300">"role"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-green-300">"Lead Backend Engineer"</span>
-                <span class="text-gray-600">,</span>
-              </p>
-              <p class="pl-4">
-                <span class="text-blue-300">"stack"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-gray-600">["</span>
-                <span class="text-yellow-300">Python</span>
-                <span class="text-gray-600">", "</span>
-                <span class="text-yellow-300">Django</span>
-                <span class="text-gray-600">", "</span>
-                <span class="text-yellow-300">PostgreSQL</span>
-                <span class="text-gray-600">", "</span>
-                <span class="text-yellow-300">GCP</span>
-                <span class="text-gray-600">"],</span>
-              </p>
-              <p class="pl-4">
-                <span class="text-blue-300">"location"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-green-300">"Ghana, West Africa"</span>
-                <span class="text-gray-600">,</span>
-              </p>
-              <p class="pl-4">
-                <span class="text-blue-300">"status"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-green-300">"operational"</span>
-                <span class="text-gray-600">,</span>
-              </p>
-              <p class="pl-4">
-                <span class="text-blue-300">"transactions_daily"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-purple-300">10000</span>
-                <span class="text-gray-600">,</span>
-              </p>
-              <p class="pl-4">
-                <span class="text-blue-300">"uptime"</span>
-                <span class="text-gray-500">: </span>
-                <span class="text-green-300">"99.9%"</span>
-              </p>
-              <p><span class="text-gray-600">{"}"}</span></p>
-            </div>
+        <!-- Nodes -->
+        <g stroke="currentColor" stroke-width="1" class="fill-surface">
+          <rect x="4.5" y="20.5" width="129" height="47" rx="6" />
+          <rect x="175.5" y="20.5" width="129" height="47" rx="6" />
+          <rect x="346.5" y="20.5" width="129" height="47" rx="6" />
+          <rect x="346.5" y="120.5" width="129" height="47" rx="6" />
+          <rect x="175.5" y="120.5" width="129" height="47" rx="6" />
+          <rect x="4.5" y="120.5" width="129" height="47" rx="6" />
+          <rect x="175.5" y="220.5" width="129" height="47" rx="6" />
+        </g>
 
-            <!-- Blinking cursor -->
-            <div class="mt-4 flex items-center gap-2">
-              <span class="text-blue-400">$</span>
-              <span class="w-2 h-4 bg-blue-400 animate-blink" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        <g class="font-mono">
+          <g font-size="12.5" class="fill-fg" font-weight="500">
+            <text x="18" y="41">submitted</text>
+            <text x="189" y="41">team lead</text>
+            <text x="360" y="41">finance</text>
+            <text x="360" y="141">audit</text>
+            <text x="189" y="141">admin</text>
+            <text x="18" y="141">returned</text>
+            <text x="201" y="241">approved</text>
+          </g>
+          <g font-size="10.5" class="fill-muted">
+            <text x="18" y="57">applicant</text>
+            <text x="189" y="57">stage 1</text>
+            <text x="360" y="57">stage 2</text>
+            <text x="360" y="157">stage 3</text>
+            <text x="189" y="157">stage 4</text>
+            <text x="18" y="157">for revision</text>
+            <text x="189" y="257">visa · travel next</text>
+          </g>
+          <circle cx="192" cy="237" r="3" class="fill-accent" />
+        </g>
+      </svg>
+      <figcaption class="mt-4 font-mono text-xs leading-relaxed text-subtle">
+        fig. 1 — scholarship approval workflow. Each transition is role-checked and
+        row-locked, and every change is kept in the record's audit history.
+      </figcaption>
+    </figure>
   </div>
 </section>

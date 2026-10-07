@@ -4,9 +4,16 @@ description: "Migrated production services from a traditional VPS setup to a ful
 problem: "Production services were running on manually managed VPS instances with no repeatable deployment process, no secrets management, and no ability to scale under load. Deployments were stressful, manual, and error-prone."
 impact: "All services run on GCP with automated deployments, managed database, proper secrets handling, and the ability to scale horizontally. Deployments went from a 30-minute manual process to a 5-minute automated pipeline triggered by a Git push."
 tags: ["GCP", "Cloud Run", "Cloud SQL", "Docker", "GitHub Actions", "Secret Manager", "Cloud Storage"]
-order: 4
+order: 3
 featured: false
+role: "Lead Backend Engineer"
+metrics:
+  - { value: "30 → 5 min", label: "Deploy time, manual to automated" }
+  - { value: "<2 min", label: "Docker image builds" }
+stack: ["Cloud Run", "Cloud SQL", "Secret Manager", "Cloud Storage", "Artifact Registry", "Docker", "GitHub Actions"]
 ---
+
+{/* TODO: add `period` to frontmatter (e.g. period: "2023 — 2024") — not stated anywhere yet, so it is omitted. */}
 
 ## Overview
 
@@ -28,7 +35,8 @@ This setup worked — until it didn't. A failed deployment during business hours
 
 ## What I Built
 
-**Cloud Run for application containers:**
+### Cloud Run for application containers
+
 Each service is packaged as a Docker container and deployed on Google Cloud Run. Cloud Run is a good fit for Django applications because:
 
 - It scales to zero between requests (no idle costs)
@@ -36,13 +44,16 @@ Each service is packaged as a Docker container and deployed on Google Cloud Run.
 - Traffic routing between revisions allows gradual rollouts
 - Each revision is immutable — "rollback" means routing traffic to a previous revision
 
-**Cloud SQL for managed PostgreSQL:**
+### Cloud SQL for managed PostgreSQL
+
 The PostgreSQL database was migrated to Cloud SQL (PostgreSQL edition). Cloud SQL handles automated backups with configurable retention, point-in-time recovery, high availability with automatic failover, and maintenance windows that don't require manual intervention. The Cloud SQL Auth Proxy handles connectivity from Cloud Run without exposed database IPs.
 
-**GCP Secret Manager for all secrets:**
-Every secret — database credentials, API keys, payment gateway secrets, Django `SECRET_KEY` — is stored in Secret Manager. Application containers pull secrets at startup. No secrets in environment variable files. No secrets in source code. Secret access is controlled by IAM service accounts with the minimum required permissions.
+### GCP Secret Manager for all secrets
 
-**GitHub Actions CI/CD pipeline:**
+Every secret — database credentials, third-party API keys, Django `SECRET_KEY` — is stored in Secret Manager. Application containers pull secrets at startup. No secrets in environment variable files. No secrets in source code. Secret access is controlled by IAM service accounts with the minimum required permissions.
+
+### GitHub Actions CI/CD pipeline
+
 ```
 push to main
   → run tests (pytest)
@@ -55,21 +66,26 @@ push to main
 
 If any step fails, the pipeline stops. The previous Cloud Run revision continues serving traffic. No manual intervention needed for routine deployments.
 
-**Cloud Storage for media and document files:**
+### Cloud Storage for media and document files
+
 All user-uploaded files and generated documents are stored in Cloud Storage buckets with appropriate lifecycle policies. Application code never stores files on the container filesystem — containers are ephemeral and stateless.
 
 ## Technical Highlights
 
-**Docker image optimization:**
+### Docker image optimization
+
 Django Docker images can get large and slow to build. I used multi-stage builds to separate the dependency installation step (slow, but cacheable) from the application code copy (fast). Using `.dockerignore` to exclude unnecessary files kept the final image small and builds under 2 minutes.
 
-**Database migration safety:**
+### Database migration safety
+
 Cloud SQL combined with the CI/CD pipeline introduced a discipline around migrations: migrations run as a separate step before the new container revision handles traffic. The old container revision continues running during migration. This means migrations must be backwards-compatible — additive, not destructive.
 
-**IAM least-privilege:**
+### IAM least-privilege
+
 Each Cloud Run service has its own service account with only the permissions it needs. The API service can read secrets, access Cloud SQL, and write to its specific storage bucket. It cannot access secrets belonging to other services, cannot access other databases, and cannot list all buckets. IAM review is part of every new service setup.
 
-**Health checks:**
+### Health checks
+
 Each Django service exposes a `/healthz/` endpoint that checks database connectivity and returns a structured JSON response. Cloud Run uses this for startup and liveness probing — a container that can't reach the database won't receive traffic.
 
 ## What I Learned
