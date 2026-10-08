@@ -1,0 +1,87 @@
+---
+title: "Scholarship Platform"
+description: "The backend for a scholarship programme: the full award lifecycle from application to completion, built on Django, PostgreSQL and Google Cloud."
+problem: "A scholarship runs for years per scholar and involves applicants and 12 distinct staff roles. Every decision has to be traceable, every approval has to happen in the right order, and the same records are edited concurrently by people with very different permissions."
+impact: "One backend now carries a scholar through the whole programme, with multi-stage approval workflows, full change history on 56 models, and 1,085 automated tests guarding it."
+tags: ["Python", "Django", "Django REST Framework", "PostgreSQL", "GCP", "Terraform", "Redis"]
+order: 1
+role: "Lead Backend Engineer"
+period: "2024 — present"
+metrics:
+  - { value: "1,085", label: "Automated tests across 57 files" }
+  - { value: "12", label: "Staff roles with composed, per-endpoint permissions" }
+  - { value: "4", label: "Multi-stage approval workflows modelled as state machines" }
+  - { value: "98%", label: "Of backend commits, May 2024 to present" }
+stack: ["Django 5", "Django REST Framework", "PostgreSQL (Cloud SQL)", "Redis", "Cloud Tasks", "App Engine", "Cloud Storage", "Terraform", "GitHub Actions", "Sentry"]
+---
+
+## Overview
+
+I lead the backend for a scholarship programme, and I've written roughly 98% of its 1,054 commits since May 2024.
+
+The platform covers the whole award lifecycle: applications and review on the way in, then the years of programme administration that follow an award, through to completion.
+
+It is a Django 5 and Django REST Framework codebase of 22 apps and around 88 registered API resources, running on Google Cloud with separate dev, staging and production environments.
+
+## The Challenge
+
+A scholar's record is touched by many people over many years, and each of them is allowed to do something slightly different.
+
+- **Many roles, one record.** Applicants plus 12 staff roles act on the same scholars at different stages, each with a different slice of what they can see and change.
+- **Ordered approvals.** Several processes pass through a fixed sequence of sign-offs. Skipping a step, or two people advancing the same record at once, must be impossible.
+- **Accountability.** Any change to a scholar's status, documents or funding has to be explainable after the fact: who did it, when, and what it was before.
+- **Bursty load.** When intake opens, a large number of applicants arrive at once and create applications in the same few minutes.
+
+## Architecture
+
+### Workflows as explicit state machines
+
+Each long-running process (four of them) is an explicit state machine rather than a set of loosely related flags. Every transition is checked on the server against the acting user's role and the record's current state, and statuses that depend on other records are derived from them rather than stored separately, so they can't drift out of sync.
+
+### Permissions composed per endpoint
+
+Access control is built from small role-based permission classes composed per endpoint, then combined with object ownership checks: an applicant sees only their own records, and a reviewer sees only what's assigned to them. Public endpoints are rate-limited.
+
+### Async work and scheduled jobs
+
+Anything that doesn't need to block a request goes through Google Cloud Tasks, including OTP delivery by email and SMS. Scheduled jobs run on App Engine cron. Authentication is JWT with OTP verification.
+
+### Documents and letters
+
+Uploaded documents live in Google Cloud Storage and are served through signed URLs. A companion Node service (Handlebars + Puppeteer) generates the programme's official letters as PDFs, with QR codes and draft/void watermarks.
+
+### Infrastructure
+
+Infrastructure is defined in Terraform, secrets live in Secret Manager, and Redis handles caching. GitHub Actions runs pre-commit checks and the full pytest suite against PostgreSQL on every change, and Sentry reports errors from each environment. API documentation is generated as Swagger/OpenAPI.
+
+## Technical Highlights
+
+### Concurrency-safe state transitions
+
+Approval steps lock the rows they change with `select_for_update`, so two staff members acting on the same record at the same moment are serialised and the second sees the result of the first. ID allocation uses a PostgreSQL sequence, which keeps record creation correct under burst load.
+
+### Full change history for audit
+
+56 models carry full change history via django-simple-history. Every edit to a scholar's record is stored with who made it and what it replaced, so audit questions are answered from data rather than memory.
+
+### Data protection by default
+
+Sensitive financial fields are encrypted at rest. Records are soft-deleted rather than removed, and public identifiers are UUIDs only, so sequential database IDs never leave the API.
+
+### Admin performance audit
+
+I audited the Django admin and removed full-table loads from relation fields, so staff pages stay fast as reference and applicant tables grow.
+
+### Data import and reference data
+
+Management commands import reference data from source files, so new intakes are configured without manual data entry.
+
+### Tests and migrations
+
+1,085 tests across 57 files (pytest + factory_boy) cover permissions, workflow transitions and edge cases. The schema has evolved through 422 migrations.
+
+## What I Learned
+
+On a system like this, the data model is the product. Getting the states and the allowed transitions right, and enforcing them on the server with row locks where records are contended, removed whole classes of bugs before they could be written.
+
+The other lesson is that auditability is cheapest when it's structural. Change history, soft deletes and derived statuses cost little to add early and are very hard to retrofit once real decisions depend on the data.

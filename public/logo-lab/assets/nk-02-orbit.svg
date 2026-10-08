@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="680" height="400" viewBox="0 0 680 400" role="img" aria-labelledby="nk-02-orbit-title nk-02-orbit-desc">
+<title id="nk-02-orbit-title">Orbit</title><desc id="nk-02-orbit-desc">Interactive initials logo concept for Nana Kwame. Hover to see subtle motion.</desc>
+<style>
+      .ink{fill:#18352d}.green{fill:#238463}.mint{fill:#a9dfc3}.gold{fill:#c49a53}
+      .stroke-ink{stroke:#18352d}.stroke-green{stroke:#238463}.stroke-gold{stroke:#c49a53}
+      .move,.draw,.spin,.pulse{transform-box:fill-box;transform-origin:center;transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .45s ease,stroke-dashoffset 1s ease}
+      svg:hover .move{transform:translateY(-7px)}
+      svg:hover .spin{transform:rotate(24deg)}
+      svg:hover .pulse{transform:scale(1.12)}
+      svg:hover .draw{stroke-dashoffset:0!important}
+      @media (prefers-reduced-motion:reduce){.move,.draw,.spin,.pulse{transition:none!important}}
+      
+    </style>
+
+<circle cx="340" cy="200" r="130" fill="none" stroke="#a9dfc3" stroke-width="2"/>
+<path class="spin" d="M340 70A130 130 0 0 1 463 159" fill="none" stroke="#238463" stroke-width="12" stroke-linecap="round"/>
+<text x="340" y="237" text-anchor="middle" class="ink" font-family="Georgia,serif" font-size="111" font-weight="700" letter-spacing="-15">NK</text>
+<circle class="gold pulse" cx="467" cy="159" r="10"/><path d="M262 283H418" stroke="#238463" stroke-width="3"/>
+
+</svg>

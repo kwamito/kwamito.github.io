@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="680" height="400" viewBox="0 0 680 400" role="img" aria-labelledby="nk-01-signal-title nk-01-signal-desc">
+<title id="nk-01-signal-title">Signal</title><desc id="nk-01-signal-desc">Interactive initials logo concept for Nana Kwame. Hover to see subtle motion.</desc>
+<style>
+      .ink{fill:#18352d}.green{fill:#238463}.mint{fill:#a9dfc3}.gold{fill:#c49a53}
+      .stroke-ink{stroke:#18352d}.stroke-green{stroke:#238463}.stroke-gold{stroke:#c49a53}
+      .move,.draw,.spin,.pulse{transform-box:fill-box;transform-origin:center;transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .45s ease,stroke-dashoffset 1s ease}
+      svg:hover .move{transform:translateY(-7px)}
+      svg:hover .spin{transform:rotate(24deg)}
+      svg:hover .pulse{transform:scale(1.12)}
+      svg:hover .draw{stroke-dashoffset:0!important}
+      @media (prefers-reduced-motion:reduce){.move,.draw,.spin,.pulse{transition:none!important}}
+      
+    </style>
+
+<g class="move" fill="none" stroke="#18352d" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter">
+ <path d="M178 282V118L289 282V118"/><path d="M365 118V282M476 118L365 211L484 282"/>
+</g>
+<path class="draw" d="M210 96H302V157" fill="none" stroke="#238463" stroke-width="8" stroke-dasharray="154" stroke-dashoffset="154"/>
+<circle class="green pulse" cx="302" cy="96" r="12"/><circle class="green pulse" cx="502" cy="282" r="11"/>
+
+</svg>

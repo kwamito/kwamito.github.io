@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="680" height="400" viewBox="0 0 680 400" role="img" aria-labelledby="nk-05-facet-title nk-05-facet-desc">
+<title id="nk-05-facet-title">Facet</title><desc id="nk-05-facet-desc">Interactive initials logo concept for Nana Kwame. Hover to see subtle motion.</desc>
+<style>
+      .ink{fill:#18352d}.green{fill:#238463}.mint{fill:#a9dfc3}.gold{fill:#c49a53}
+      .stroke-ink{stroke:#18352d}.stroke-green{stroke:#238463}.stroke-gold{stroke:#c49a53}
+      .move,.draw,.spin,.pulse{transform-box:fill-box;transform-origin:center;transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .45s ease,stroke-dashoffset 1s ease}
+      svg:hover .move{transform:translateY(-7px)}
+      svg:hover .spin{transform:rotate(24deg)}
+      svg:hover .pulse{transform:scale(1.12)}
+      svg:hover .draw{stroke-dashoffset:0!important}
+      @media (prefers-reduced-motion:reduce){.move,.draw,.spin,.pulse{transition:none!important}}
+      
+    </style>
+
+<path class="spin" d="M340 55L485 200L340 345L195 200Z" fill="none" stroke="#238463" stroke-width="5"/>
+<path d="M246 259V141L315 259V141" fill="none" stroke="#18352d" stroke-width="17" stroke-linejoin="bevel"/>
+<path d="M369 141V259M443 141L369 207L446 259" fill="none" stroke="#18352d" stroke-width="17" stroke-linejoin="bevel"/>
+<path d="M340 55L383 98" stroke="#c49a53" stroke-width="10" stroke-linecap="round"/><circle class="gold pulse" cx="340" cy="55" r="8"/>
+
+</svg>

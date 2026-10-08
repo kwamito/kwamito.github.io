@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="680" height="400" viewBox="0 0 680 400" role="img" aria-labelledby="name-01-editorial-title name-01-editorial-desc">
+<title id="name-01-editorial-title">Editorial</title><desc id="name-01-editorial-desc">Interactive full name logo concept for Nana Kwame. Hover to see subtle motion.</desc>
+<style>
+      .ink{fill:#18352d}.green{fill:#238463}.mint{fill:#a9dfc3}.gold{fill:#c49a53}
+      .stroke-ink{stroke:#18352d}.stroke-green{stroke:#238463}.stroke-gold{stroke:#c49a53}
+      .move,.draw,.spin,.pulse{transform-box:fill-box;transform-origin:center;transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .45s ease,stroke-dashoffset 1s ease}
+      svg:hover .move{transform:translateY(-7px)}
+      svg:hover .spin{transform:rotate(24deg)}
+      svg:hover .pulse{transform:scale(1.12)}
+      svg:hover .draw{stroke-dashoffset:0!important}
+      @media (prefers-reduced-motion:reduce){.move,.draw,.spin,.pulse{transition:none!important}}
+      
+    </style>
+
+<text x="340" y="203" text-anchor="middle" class="ink move" font-family="Georgia,serif" font-size="82" font-weight="700" letter-spacing="-5">Nana Kwame</text>
+<path class="draw" d="M115 230H565" fill="none" stroke="#238463" stroke-width="4" stroke-dasharray="450" stroke-dashoffset="450"/>
+<text x="340" y="269" text-anchor="middle" class="green" font-family="Arial,sans-serif" font-size="16" letter-spacing="9">ENGINEER · MAKER</text>
+
+</svg>
