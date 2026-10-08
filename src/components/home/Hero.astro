@@ -26,8 +26,8 @@ import StatusDot from '../ui/StatusDot.astro';
 
       <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted text-pretty">
         I design and run Django and PostgreSQL systems on Google Cloud. My flagship is the
-        backend for Ghana's GETFund scholarship programme: the full award lifecycle, 12
-        staff roles, multi-stage approvals and a change history on every record that matters.
+        backend for a scholarship programme: the full award lifecycle, 12 staff
+        roles, multi-stage approvals and a change history on every record that matters.
       </p>
 
       <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -43,16 +43,18 @@ import StatusDot from '../ui/StatusDot.astro';
 
     <figure class="lg:col-span-5 animate-fade-up anim-delay-200">
       <svg
-        viewBox="0 0 480 290"
+        viewBox="0 0 480 172"
         class="w-full max-w-md lg:max-w-none text-line-strong"
         role="img"
         aria-labelledby="arch-title arch-desc"
         fill="none"
       >
-        <title id="arch-title">Yearly scholarship reconfirmation workflow</title>
+        <title id="arch-title">Anatomy of a safe write request</title>
         <desc id="arch-desc">
-          A scholar's yearly reconfirmation moves through four review stages in order: team lead, finance,
-          audit and admin. Admin approval confirms the year; otherwise the reconfirmation is rejected.
+          A client sends a request with an idempotency key. The API authenticates and validates it, then writes
+          the state change and an outbox event to PostgreSQL in one transaction. Workers read the outbox and
+          send side effects such as emails and webhooks with retries; deliveries that keep failing go to a
+          dead-letter queue for alerting and replay.
         </desc>
         <defs>
           <marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -66,15 +68,16 @@ import StatusDot from '../ui/StatusDot.astro';
           <path d="M305 44 H344" />
           <path d="M411 68 V118" />
           <path d="M346 144 H307" />
-          <path d="M240 168 V218" />
           <path d="M175 144 H136" stroke-dasharray="3 3" />
         </g>
 
         <!-- Edge labels -->
         <g class="font-mono fill-subtle" font-size="10.5">
-          <text x="419" y="97">approve</text>
-          <text x="248" y="197">approve</text>
-          <text x="155" y="136" text-anchor="middle">reject</text>
+          <text x="154" y="36" text-anchor="middle">POST</text>
+          <text x="325" y="36" text-anchor="middle">1 txn</text>
+          <text x="419" y="97">outbox</text>
+          <text x="326" y="136" text-anchor="middle">send</text>
+          <text x="155" y="136" text-anchor="middle">fail</text>
         </g>
 
         <!-- Nodes -->
@@ -84,35 +87,33 @@ import StatusDot from '../ui/StatusDot.astro';
           <rect x="346.5" y="20.5" width="129" height="47" rx="6" />
           <rect x="346.5" y="120.5" width="129" height="47" rx="6" />
           <rect x="175.5" y="120.5" width="129" height="47" rx="6" />
-          <rect x="4.5" y="120.5" width="129" height="47" rx="6" />
-          <rect x="175.5" y="220.5" width="129" height="47" rx="6" />
+          <rect x="4.5" y="120.5" width="129" height="47" rx="6" stroke-dasharray="3 3" />
         </g>
 
         <g class="font-mono">
           <g font-size="12.5" class="fill-fg" font-weight="500">
-            <text x="18" y="41">submitted</text>
-            <text x="189" y="41">team lead</text>
-            <text x="360" y="41">finance</text>
-            <text x="360" y="141">audit</text>
-            <text x="189" y="141">admin</text>
-            <text x="18" y="141">rejected</text>
-            <text x="201" y="241">approved</text>
+            <text x="18" y="41">client</text>
+            <text x="189" y="41">api</text>
+            <text x="372" y="41">postgres</text>
+            <text x="360" y="141">workers</text>
+            <text x="189" y="141">side effects</text>
+            <text x="18" y="141">dead letter</text>
           </g>
           <g font-size="10.5" class="fill-muted">
-            <text x="18" y="57">scholar</text>
-            <text x="189" y="57">stage 1</text>
-            <text x="360" y="57">stage 2</text>
-            <text x="360" y="157">stage 3</text>
-            <text x="189" y="157">stage 4</text>
-            <text x="18" y="157">not confirmed</text>
-            <text x="189" y="257">year confirmed</text>
+            <text x="18" y="57">Idempotency-Key</text>
+            <text x="189" y="57">auth · validate</text>
+            <text x="360" y="57">state + outbox</text>
+            <text x="360" y="157">retry · backoff</text>
+            <text x="189" y="157">email · webhooks</text>
+            <text x="18" y="157">alert · replay</text>
           </g>
-          <circle cx="192" cy="237" r="3" class="fill-accent" />
+          <circle cx="363" cy="37" r="3" class="fill-accent" />
         </g>
       </svg>
       <figcaption class="mt-4 font-mono text-xs leading-relaxed text-subtle">
-        fig. 1 — yearly reconfirmation. Each step is role-checked and row-locked, and
-        every change stays in the record's history.
+        fig. 1 — one write, end to end. The idempotency key makes retries safe, the state
+        change and its outbox event commit together, and workers deliver side effects
+        with retries.
       </figcaption>
     </figure>
   </div>
