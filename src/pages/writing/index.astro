@@ -52,7 +52,7 @@ for (const post of sorted) {
                       {formatDate(post.data.date, 'dayMonth')}
                     </time>
                     <div>
-                      <h3 class="text-lg font-medium leading-snug text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
+                      <h3 style={`view-transition-name: post-${post.id}; view-transition-class: title-morph`} class="text-lg font-medium leading-snug text-fg text-balance underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-line-strong transition-colors">
                         {post.data.title}
                       </h3>
                       <p class="mt-2 text-sm text-muted leading-relaxed text-pretty">{post.data.description}</p>

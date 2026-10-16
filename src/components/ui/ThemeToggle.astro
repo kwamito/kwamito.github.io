@@ -1,5 +1,6 @@
 ---
-// ThemeToggle — toggles .dark on <html> and persists to localStorage
+// ThemeToggle: toggles .dark on <html>, persists to localStorage, and crossfades
+// the whole page between themes where the View Transitions API is available.
 ---
 
 <button
@@ -8,11 +9,10 @@
   title="Toggle dark mode"
   class="relative flex items-center justify-center w-9 h-9 rounded-lg text-muted hover:text-fg hover:bg-sunken transition-colors duration-150"
 >
-  <!-- Sun icon (shown in dark mode) -->
+  <!-- Both icons stay in the DOM so they can rotate past each other. -->
   <svg
-    id="icon-sun"
+    class="theme-icon absolute size-4.5 opacity-0 -rotate-90 scale-50 dark:opacity-100 dark:rotate-0 dark:scale-100"
     xmlns="http://www.w3.org/2000/svg"
-    class="hidden size-4.5"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -25,11 +25,9 @@
     <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
   </svg>
 
-  <!-- Moon icon (shown in light mode) -->
   <svg
-    id="icon-moon"
+    class="theme-icon absolute size-4.5 opacity-100 rotate-0 scale-100 dark:opacity-0 dark:rotate-90 dark:scale-50"
     xmlns="http://www.w3.org/2000/svg"
-    class="size-4.5"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -42,30 +40,47 @@
   </svg>
 </button>
 
-<script>
-  function initTheme() {
-    const btn = document.getElementById('theme-toggle');
-    const sun = document.getElementById('icon-sun');
-    const moon = document.getElementById('icon-moon');
-    const html = document.documentElement;
-
-    function update() {
-      const isDark = html.classList.contains('dark');
-      if (sun) sun.classList.toggle('hidden', !isDark);
-      if (moon) moon.classList.toggle('hidden', isDark);
-      if (btn) btn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-    }
-
-    update();
-
-    btn?.addEventListener('click', () => {
-      html.classList.toggle('dark');
-      try {
-        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-      } catch {}
-      update();
-    });
+<style>
+  .theme-icon {
+    /* Tailwind v4 rotate and scale utilities set the individual rotate and scale properties. */
+    transition:
+      rotate 420ms var(--ease-out-expo),
+      scale 420ms var(--ease-out-expo),
+      opacity 220ms ease;
   }
+</style>
 
-  initTheme();
+<script>
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  const label = () =>
+    btn?.setAttribute(
+      'aria-label',
+      html.classList.contains('dark') ? 'Switch to light mode' : 'Switch to dark mode',
+    );
+
+  const apply = () => {
+    html.classList.toggle('dark');
+    try {
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    } catch {}
+    label();
+  };
+
+  label();
+
+  btn?.addEventListener('click', () => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Same-document view transition: the old theme fades into the new one
+    // (slower than page navigation; see .theme-switching in global.css).
+    if (!reduce && 'startViewTransition' in document) {
+      html.classList.add('theme-switching');
+      document
+        .startViewTransition(apply)
+        .finished.finally(() => html.classList.remove('theme-switching'));
+    } else {
+      apply();
+    }
+  });
 </script>

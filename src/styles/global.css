@@ -281,3 +281,58 @@
     padding-block: 5.5rem;
   }
 }
+
+/* ================================================================
+   Page transitions (cross-document View Transitions, no JS).
+   Browsers without support simply navigate as before.
+   ================================================================ */
+@view-transition {
+  navigation: auto;
+}
+
+/* Page content: a quick crossfade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease;
+}
+
+/* Theme switch (same-document transition): a slower, softer crossfade. */
+html.theme-switching::view-transition-old(*),
+html.theme-switching::view-transition-new(*) {
+  animation-duration: 320ms;
+}
+
+/* The header is identical on every page, so keep it still. */
+::view-transition-group(site-header) {
+  animation: none;
+}
+
+/* The active nav underline slides to the new link. */
+::view-transition-group(nav-indicator) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+/* A card or list title glides into the page heading it links to. */
+::view-transition-group(*.title-morph) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+::view-transition-old(*.title-morph),
+::view-transition-new(*.title-morph) {
+  /* Keep text crisp: anchor both snapshots top-left instead of stretching them. */
+  height: 100%;
+  width: auto;
+  object-fit: none;
+  object-position: left top;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

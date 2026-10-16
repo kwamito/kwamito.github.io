@@ -20,6 +20,7 @@ function isActive(href: string) {
 
 <header
   class="fixed top-0 left-0 right-0 z-50 border-b border-line bg-canvas/80 backdrop-blur-md backdrop-saturate-150"
+  style="view-transition-name: site-header"
 >
   <nav class="wrap h-16 flex items-center justify-between" aria-label="Main navigation">
     <a href="/" class="flex items-baseline gap-2.5 rounded-sm" aria-label={`${site.shortName} — home`}>
@@ -35,13 +36,18 @@ function isActive(href: string) {
               href={href}
               class:list={[
                 'relative py-1 text-sm transition-colors duration-150',
-                isActive(href)
-                  ? 'text-fg after:absolute after:inset-x-0 after:-bottom-[19px] after:h-px after:bg-fg'
-                  : 'text-muted hover:text-fg',
+                isActive(href) ? 'text-fg' : 'text-muted hover:text-fg',
               ]}
               aria-current={isActive(href) ? 'page' : undefined}
             >
               {label}
+              {isActive(href) && (
+                <span
+                  class="absolute inset-x-0 -bottom-[19px] h-px bg-fg"
+                  style="view-transition-name: nav-indicator"
+                  aria-hidden="true"
+                ></span>
+              )}
             </a>
           </li>
         ))}

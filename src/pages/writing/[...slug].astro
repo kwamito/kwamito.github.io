@@ -48,7 +48,7 @@ const jsonLd = {
         <span class="px-2" aria-hidden="true">·</span>
         <span>{minutes} min read</span>
       </p>
-      <h1 class="mt-4 text-title text-fg text-balance">{title}</h1>
+      <h1 class="mt-4 text-title text-fg text-balance" style={`view-transition-name: post-${post.id}; view-transition-class: title-morph`}>{title}</h1>
       <p class="mt-5 text-lg sm:text-xl text-muted leading-relaxed text-pretty">{description}</p>
       {tags.length > 0 && (
         <p class="mt-6 font-mono text-xs text-subtle">

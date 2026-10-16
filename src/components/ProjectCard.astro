@@ -32,6 +32,7 @@ const tagLine = tags.slice(0, isLead ? 6 : 4).join(' · ');
     {num && <p class="font-mono text-xs text-subtle tabular">{num}</p>}
 
     <h3
+      style={`view-transition-name: project-${slug}; view-transition-class: title-morph`}
       class:list={[
         'text-fg text-balance',
         num && 'mt-4',
