@@ -20,7 +20,7 @@ const href = `/writing/${slug}/`;
       <time datetime={date.toISOString()}>{formatDate(date, 'short')}</time>
     </p>
     <div>
-      <h3 class="text-base font-semibold leading-snug tracking-tight text-fg text-balance">
+      <h3 style={`view-transition-name: post-${slug}; view-transition-class: title-morph`} class="text-base font-semibold leading-snug tracking-tight text-fg text-balance">
         <a
           href={href}
           data-card-link

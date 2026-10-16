@@ -13,7 +13,7 @@ import StatusDot from '../ui/StatusDot.astro';
         {site.availability && (
           <>
             <span class="flex basis-full items-center gap-2">
-              <StatusDot />
+              <StatusDot live />
               {site.availability}
             </span>
           </>
@@ -71,6 +71,12 @@ import StatusDot from '../ui/StatusDot.astro';
           <path d="M175 144 H136" stroke-dasharray="3 3" />
         </g>
 
+        <!-- Moving packets (drawn under the boxes so the dot disappears "inside" each service) -->
+        <g class="packets" stroke-linecap="round" aria-hidden="true">
+          <path class="packet packet-ok" d="M69 44 H411 V144 H240" pathLength="613" />
+          <path class="packet packet-fail" d="M240 144 H69" pathLength="171" />
+        </g>
+
         <!-- Edge labels -->
         <g class="font-mono fill-subtle" font-size="10.5">
           <text x="154" y="36" text-anchor="middle">POST</text>
@@ -88,6 +94,15 @@ import StatusDot from '../ui/StatusDot.astro';
           <rect x="346.5" y="120.5" width="129" height="47" rx="6" />
           <rect x="175.5" y="120.5" width="129" height="47" rx="6" />
           <rect x="4.5" y="120.5" width="129" height="47" rx="6" stroke-dasharray="3 3" />
+        </g>
+
+        <!-- Outlines that light up as the packet arrives -->
+        <g class="flashes" fill="none" stroke-width="1.25" aria-hidden="true">
+          <rect class="flash flash-api" x="175.5" y="20.5" width="129" height="47" rx="6" />
+          <rect class="flash flash-pg" x="346.5" y="20.5" width="129" height="47" rx="6" />
+          <rect class="flash flash-workers" x="346.5" y="120.5" width="129" height="47" rx="6" />
+          <rect class="flash flash-effects" x="175.5" y="120.5" width="129" height="47" rx="6" />
+          <rect class="flash flash-dead" x="4.5" y="120.5" width="129" height="47" rx="6" />
         </g>
 
         <g class="font-mono">
@@ -118,3 +133,69 @@ import StatusDot from '../ui/StatusDot.astro';
     </figure>
   </div>
 </section>
+
+<style>
+  /*
+    One request every 6 s: the dot travels client → api → postgres → workers → side effects
+    in the first 60% of the cycle (linear, so arrival times line up with the flashes below).
+    Every third cycle (18 s) a delivery fails and a second dot takes the dashed route to dead letter.
+    Under prefers-reduced-motion the global rule collapses these to their end state, where the
+    dot sits hidden inside a box and every outline is invisible, so the diagram is simply static.
+  */
+  .packet {
+    stroke: var(--accent);
+    stroke-width: 5;
+    stroke-dasharray: 0.5 4000;
+    stroke-dashoffset: 0;
+  }
+
+  .packet-ok {
+    animation: packet-ok 6s linear infinite;
+  }
+
+  .packet-fail {
+    stroke-dashoffset: 0;
+    opacity: 0;
+    animation: packet-fail 18s linear infinite;
+  }
+
+  @keyframes packet-ok {
+    0% { stroke-dashoffset: 0; }
+    60%, 100% { stroke-dashoffset: -613; }
+  }
+
+  @keyframes packet-fail {
+    0%, 86.6% { stroke-dashoffset: 0; opacity: 0; }
+    86.7% { opacity: 1; }
+    91.7% { stroke-dashoffset: -171; opacity: 1; }
+    91.8%, 100% { stroke-dashoffset: -171; opacity: 0; }
+  }
+
+  .flash {
+    stroke: var(--accent);
+    opacity: 0;
+    animation: flash 6s ease-out infinite;
+  }
+
+  /* Arrival times: distance to each box edge ÷ 613 × 60% of 6 s. */
+  .flash-api { animation-delay: 0.62s; }
+  .flash-pg { animation-delay: 1.66s; }
+  .flash-workers { animation-delay: 2.46s; }
+  .flash-effects { animation-delay: 3.22s; }
+
+  .flash-dead {
+    animation: flash-dead 18s ease-out infinite;
+  }
+
+  @keyframes flash {
+    0% { opacity: 0; }
+    4% { opacity: 1; }
+    16%, 100% { opacity: 0; }
+  }
+
+  @keyframes flash-dead {
+    0%, 89.7% { opacity: 0; }
+    90.5% { opacity: 1; }
+    95%, 100% { opacity: 0; }
+  }
+</style>

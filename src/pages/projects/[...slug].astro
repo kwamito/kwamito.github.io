@@ -54,7 +54,7 @@ const metricCols: Record<number, string> = {
     <!-- Header -->
     <header class="mt-10 max-w-3xl">
       <p class="eyebrow tabular">Case study {pad(position)} / {pad(total)}</p>
-      <h1 class="mt-4 text-title text-fg text-balance">{title}</h1>
+      <h1 class="mt-4 text-title text-fg text-balance" style={`view-transition-name: project-${project.id}; view-transition-class: title-morph`}>{title}</h1>
       <p class="mt-5 text-lg sm:text-xl text-muted leading-relaxed text-pretty">{description}</p>
     </header>
 
@@ -153,12 +153,18 @@ const metricCols: Record<number, string> = {
         <aside class="hidden lg:block" aria-label="On this page">
           <nav class="sticky top-24">
             <p class="eyebrow">On this page</p>
-            <ol class="mt-4 space-y-2.5 border-l border-line">
+            <ol class="relative mt-4 space-y-2.5 border-l border-line" data-toc>
+              <span
+                data-toc-indicator
+                class="absolute -left-px top-0 w-px bg-accent opacity-0 transition-[transform,height,opacity] duration-300 ease-out-expo"
+                aria-hidden="true"
+              ></span>
               {toc.map((h) => (
                 <li>
                   <a
                     href={`#${h.slug}`}
-                    class="-ml-px block border-l border-transparent pl-4 text-sm leading-snug text-muted hover:border-fg hover:text-fg transition-colors"
+                    data-toc-link={h.slug}
+                    class="block pl-4 text-sm leading-snug text-muted hover:text-fg aria-[current=location]:text-fg transition-colors"
                   >
                     {h.text}
                   </a>
@@ -179,3 +185,51 @@ const metricCols: Record<number, string> = {
     />
   </article>
 </Layout>
+
+<script>
+  // Highlight the section being read in the "On this page" list, with a thin accent
+  // bar that slides between entries. The active section is the last heading whose top
+  // has passed just below the fixed header.
+  const toc = document.querySelector<HTMLElement>('[data-toc]');
+  const indicator = toc?.querySelector<HTMLElement>('[data-toc-indicator]');
+  const links = [...(toc?.querySelectorAll<HTMLAnchorElement>('[data-toc-link]') ?? [])];
+  const headings = links
+    .map((link) => document.getElementById(link.dataset.tocLink ?? ''))
+    .filter((el): el is HTMLElement => el !== null);
+
+  if (toc && indicator && headings.length) {
+    const OFFSET = 120; // fixed header (64px) plus breathing room
+    let current = -1;
+
+    const setActive = (index: number) => {
+      if (index === current) return;
+      current = index;
+      links.forEach((link, i) => {
+        if (i === index) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+      const link = links[index];
+      indicator.style.transform = `translateY(${link.offsetTop}px)`;
+      indicator.style.height = `${link.offsetHeight}px`;
+      indicator.style.opacity = '1';
+    };
+
+    const update = () => {
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom) {
+        setActive(headings.length - 1);
+        return;
+      }
+      let index = 0;
+      headings.forEach((h, i) => {
+        if (h.getBoundingClientRect().top - OFFSET <= 0) index = i;
+      });
+      setActive(index);
+    };
+
+    // Only a handful of headings, so measuring on every scroll event is cheap.
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+  }
+</script>

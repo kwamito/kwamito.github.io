@@ -35,7 +35,7 @@ const inputClass =
       <SectionHeading as="h1" label="Contact" title="Let's talk." class={site.availability ? 'mb-6' : 'mb-12'} />
       {site.availability && (
         <p class="mb-12 flex items-center gap-2.5 text-muted">
-          <StatusDot />
+          <StatusDot live />
           <span>
             {site.availability}{site.location && <span class="text-subtle"> · {site.location}</span>}
           </span>
